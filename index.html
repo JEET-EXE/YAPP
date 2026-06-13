@@ -34,7 +34,7 @@
         /* Main Layout */
         .app-container { width: 100%; max-width: 900px; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         
-        /* Sidebar */
+        /* Sidebar (Desktop) */
         .sidebar { width: 260px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; }
         .current-user-tag { padding: 16px; border-bottom: 1px solid #27272a; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; }
         .current-user-tag span { color: #a1a1aa; font-size: 0.8rem; font-weight: normal; }
@@ -57,7 +57,7 @@
         .brand-footer { padding: 10px 16px; font-size: 0.7rem; color: #3f3f46; border-top: 1px solid #27272a; background: #141416; text-align: center; letter-spacing: 0.5px; font-weight: 500; }
 
         /* Chat Area */
-        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0f0f11; min-height: 0; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0f0f11; min-height: 0; position: relative; }
         .chat-header { padding: 16px 20px; border-bottom: 1px solid #27272a; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .messages-pane { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
@@ -77,18 +77,24 @@
         .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
         .input-wrapper button:hover { color: #f4f4f5; }
 
+        /* 📱 NEW MOBILE NAVIGATION ELEMENT STYLES */
+        .mobile-nav-bar { display: none; background: #18181b; border-top: 1px solid #27272a; height: 60px; justify-content: space-around; align-items: center; }
+        .nav-item { color: #a1a1aa; font-size: 0.9rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 50%; height: 100%; justify-content: center; transition: 0.2s; }
+        .nav-item.active { color: #f4f4f5; background: #27272a; }
+
+        /* 📱 MOBILE MODAL OVERLAY FOR CHATS */
+        .mobile-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 60px); background: rgba(9,9,11,0.95); z-index: 999; flex-direction: column; padding: 20px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 10px; }
+        .close-modal-btn { background: #27272a; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+
         /* Mobile Responsive UI Overrides */
         @media (max-width: 768px) {
             body { padding: 0; overflow: hidden; }
-            .app-container { width: 100vw; max-width: 100vw; height: 100vh; border-radius: 0; border: none; display: grid; grid-template-rows: auto 1fr; }
-            .sidebar { width: 100%; height: auto; max-height: 160px; border-right: none; border-bottom: 1px solid #27272a; display: flex; flex-direction: column; }
-            .current-user-tag { padding: 10px 16px; }
-            .channels { padding: 8px; gap: 4px; max-height: 80px; }
-            .dm-start { display: flex !important; padding: 8px 12px; border-top: 1px solid #27272a; } 
-            .brand-footer { display: none; } 
-            .chat-main { height: 100%; min-height: 0; overflow: hidden; }
-            .chat-header { padding: 12px 16px; }
-            .messages-pane { padding: 12px; gap: 12px; }
+            .app-container { width: 100vw; max-width: 100vw; height: 100vh; border-radius: 0; border: none; display: flex; flex-direction: column; }
+            .sidebar { display: none !important; } /* Atomize the desktop sidebar on mobile */
+            .chat-main { flex: 1; height: calc(100vh - 60px); }
+            .mobile-nav-bar { display: flex; }
+            .messages-pane { padding: 15px; gap: 12px; }
             .input-container { padding: 12px; }
         }
     </style>
@@ -131,6 +137,8 @@
 
     <!-- MAIN APP SCREEN -->
     <div class="app-container hidden" id="app-screen">
+        
+        <!-- DESKTOP SIDEBAR -->
         <div class="sidebar">
             <div class="current-user-tag" id="user-profile-summary"></div>
             <div class="channels">
@@ -144,7 +152,7 @@
                 <label>Start Private DM</label>
                 <div style="display: flex; gap: 4px; width: 100%;">
                     <input type="text" id="dm-target-input" placeholder="User#12345 + Enter" onkeypress="handleDmTargetKey(event)" style="flex: 1;">
-                    <button onclick="triggerMobileDmSubmit()" style="background: #27272a; color: white; border: 1px solid #3f3f46; border-radius: 6px; padding: 0 10px; cursor: pointer; font-size: 0.8rem;">Go</button>
+                    <button onclick="triggerMobileDmSubmit(false)" style="background: #27272a; color: white; border: 1px solid #3f3f46; border-radius: 6px; padding: 0 10px; cursor: pointer; font-size: 0.8rem;">Go</button>
                 </div>
             </div>
             <div class="brand-footer">
@@ -152,7 +160,27 @@
             </div>
         </div>
 
+        <!-- MAIN CHAT INTERFACE -->
         <div class="chat-main">
+            
+            <!-- MOBILE CHATS OVERLAY MODAL -->
+            <div class="mobile-modal" id="chats-overlay-modal">
+                <div class="modal-header">
+                    <h3 style="font-size: 1.1rem; font-weight: bold;">Direct Messages</h3>
+                    <button class="close-modal-btn" onclick="toggleMobileModal(false)">Close</button>
+                </div>
+                <!-- Dynamic Mobile DM lists anchor here -->
+                <div id="mobile-dm-list-container" style="display:flex; flex-direction:column; gap:10px; flex: 1; overflow-y: auto; margin-bottom: 20px;"></div>
+                
+                <div style="background: #18181b; padding: 15px; border-radius: 8px; border: 1px solid #27272a;">
+                    <label style="display:block; margin-bottom: 8px;">Start Private DM</label>
+                    <div style="display: flex; gap: 6px; width: 100%;">
+                        <input type="text" id="mobile-dm-target-input" placeholder="User#12345" style="flex: 1; padding: 12px;" onkeypress="if(event.key==='Enter') triggerMobileDmSubmit(true)">
+                        <button onclick="triggerMobileDmSubmit(true)" style="background: #f4f4f5; color: #09090b; border: none; border-radius: 6px; padding: 0 20px; font-weight: bold; cursor: pointer;">Go</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="chat-header" id="chat-header-root">
                 <div id="chat-title-text">🌍 global-yapp</div>
                 <div id="admin-nuke-slot"></div>
@@ -164,6 +192,19 @@
                     <button onclick="dispatchMessage()">Yap</button>
                 </div>
             </div>
+
+            <!-- Sleek Mobile Bottom Bar Navigation Framework -->
+            <div class="mobile-nav-bar">
+                <div class="nav-item active" id="mobile-nav-global" onclick="handleMobileNavClick('global')">
+                    <span>🌍</span>
+                    <span>Global</span>
+                </div>
+                <div class="nav-item" id="mobile-nav-chats" onclick="handleMobileNavClick('chats')">
+                    <span>💬</span>
+                    <span>Chats</span>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -330,12 +371,13 @@
     function handleDmTargetKey(e) {
         if(e.key === 'Enter') {
             e.preventDefault();
-            triggerMobileDmSubmit();
+            triggerMobileDmSubmit(false);
         }
     }
 
-    function triggerMobileDmSubmit() {
-        const targetInput = document.getElementById('dm-target-input');
+    function triggerMobileDmSubmit(isFromMobileModal = false) {
+        const inputId = isFromMobileModal ? 'mobile-dm-target-input' : 'dm-target-input';
+        const targetInput = document.getElementById(inputId);
         const targetUser = targetInput.value.trim();
         
         if(!targetUser || targetUser.toLowerCase() === currentUser.fullTag.toLowerCase()) {
@@ -346,6 +388,11 @@
         const exists = activeDms.some(val => val.toLowerCase() === targetUser.toLowerCase());
         if(!exists) {
             activeDms.push(targetUser.toLowerCase());
+        }
+
+        if(isFromMobileModal) {
+            toggleMobileModal(false);
+            updateMobileNavHighlights('chats');
         }
 
         switchTab(getRoomId(currentUser.fullTag, targetUser), `💬 ${targetUser}`);
@@ -371,6 +418,7 @@
             
             if (currentTab === targetRoom) {
                 switchTab('global', '🌍 global-yapp');
+                updateMobileNavHighlights('global');
             } else {
                 renderDmList();
             }
@@ -381,20 +429,41 @@
     }
 
     function renderDmList() {
-        const container = document.getElementById('dm-list-container');
-        container.innerHTML = '';
+        const desktopContainer = document.getElementById('dm-list-container');
+        const mobileContainer = document.getElementById('mobile-dm-list-container');
+        
+        desktopContainer.innerHTML = '';
+        mobileContainer.innerHTML = '';
         
         activeDms.forEach(user => {
             const roomId = getRoomId(currentUser.fullTag, user);
-            const btn = document.createElement('div');
-            btn.className = `chan-btn ${currentTab === roomId ? 'active' : ''}`;
-            btn.onclick = () => switchTab(roomId, `💬 ${user}`);
             
-            btn.innerHTML = `
+            // Render for Desktop
+            const btnDesktop = document.createElement('div');
+            btnDesktop.className = `chan-btn ${currentTab === roomId ? 'active' : ''}`;
+            btnDesktop.onclick = () => switchTab(roomId, `💬 ${user}`);
+            btnDesktop.innerHTML = `
                 <div class="chan-left">💬 ${user}</div>
                 <div class="nuke-room-trigger" onclick="nukeChatRoom('${user}', event)">✕</div>
             `;
-            container.appendChild(btn);
+            desktopContainer.appendChild(btnDesktop);
+
+            // Render for Mobile with larger, easier-to-tap targets
+            const btnMobile = document.createElement('div');
+            btnMobile.className = `chan-btn ${currentTab === roomId ? 'active' : ''}`;
+            btnMobile.style.padding = "16px 12px"; /* Big hit-box spacing */
+            btnMobile.style.background = "#18181b";
+            btnMobile.style.border = "1px solid #27272a";
+            btnMobile.onclick = () => {
+                switchTab(roomId, `💬 ${user}`);
+                toggleMobileModal(false);
+                updateMobileNavHighlights('chats');
+            };
+            btnMobile.innerHTML = `
+                <div class="chan-left" style="font-size: 1rem; font-weight: 500;">💬 ${user}</div>
+                <div class="nuke-room-trigger" style="font-size: 1.1rem; padding: 6px 12px;" onclick="nukeChatRoom('${user}', event)">✕</div>
+            `;
+            mobileContainer.appendChild(btnMobile);
         });
     }
 
@@ -412,6 +481,27 @@
 
         renderDmList();
         fetchMessages();
+    }
+
+    /* 📱 NEW MOBILE UI NAVIGATION MOTORS */
+    function handleMobileNavClick(type) {
+        if(type === 'global') {
+            toggleMobileModal(false);
+            switchTab('global', '🌍 global-yapp');
+            updateMobileNavHighlights('global');
+        } else if(type === 'chats') {
+            toggleMobileModal(true);
+        }
+    }
+
+    function toggleMobileModal(show) {
+        const modal = document.getElementById('chats-overlay-modal');
+        modal.style.display = show ? 'flex' : 'none';
+    }
+
+    function updateMobileNavHighlights(activeType) {
+        document.getElementById('mobile-nav-global').classList.toggle('active', activeType === 'global');
+        document.getElementById('mobile-nav-chats').classList.toggle('active', activeType === 'chats');
     }
 
     async function fetchMessages() {
@@ -479,7 +569,6 @@
 
     function handleChatKey(e) { if(e.key === 'Enter') dispatchMessage(); }
 
-    // Fixed rendering pipeline setup
     function renderMessages(messagesList) {
         const pane = document.getElementById('messages-root');
         pane.innerHTML = '';
