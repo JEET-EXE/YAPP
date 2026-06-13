@@ -63,7 +63,6 @@
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
     <div class="auth-card" id="auth-screen">
         <h2>Welcome to Yapp</h2>
         <p>Stop talking, start yapping.</p>
@@ -93,19 +92,15 @@
         <button class="btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
-    <!-- MAIN APP SCREEN -->
     <div class="app-container hidden" id="app-screen">
-        <!-- Sidebar -->
         <div class="sidebar">
             <div class="current-user-tag" id="user-profile-summary">
-                <!-- Injected dynamically -->
-            </div>
+                </div>
             <div class="channels">
                 <div class="chan-btn active" id="global-chan-btn" onclick="switchTab('global')">🌍 global-yapp</div>
                 <div style="font-size: 0.75rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; margin: 15px 0 5px 10px; font-weight: bold;">Direct Messages</div>
                 <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;">
-                    <!-- DM active lists populate here -->
-                </div>
+                    </div>
             </div>
             <div class="dm-start">
                 <label>Start Private DM</label>
@@ -113,12 +108,10 @@
             </div>
         </div>
 
-        <!-- Chat Area -->
         <div class="chat-main">
             <div class="chat-header" id="chat-title-text">🌍 global-yapp</div>
             <div class="messages-pane" id="messages-root">
-                <!-- Messages go here -->
-            </div>
+                </div>
             <div class="input-container">
                 <div class="input-wrapper">
                     <input type="text" id="chat-raw-input" placeholder="Message..." onkeypress="handleChatKey(event)">
@@ -130,10 +123,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // Connected to your actual database configuration
     const SUPABASE_URL = 'https://jbgodvduntlpblubkpxj.supabase.co/rest/v1/';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impib2R2ZHVudGxwdmx1YmtweGoiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0OTg0NTI3NywiZXhwIjoyMDY1NDIxMjc3fQ.0B3z_43_f-fH96V6O-A0T47714fc17ee3'; // Formatted securely from image_edfc9e.png
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impib2R2ZHVudGxwdmx1YmtweGoiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0OTg0NTI3NywiZXhwIjoyMDY1NDIxMjc3fQ.0B3z_43_f-fH96V6O-A0T47714fc17ee3'; 
+    
+    // Fixed declaration duplication error
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null; 
     let currentTab = 'global'; 
@@ -169,7 +163,6 @@
         fetchMessages();
     }
 
-    // Direct Messages stubbed for UI consistency out of backend tracking
     function handleDmTargetKey(e) {
         if(e.key !== 'Enter') return;
         alert("Focusing on global rooms for database testing first, bro!");
@@ -177,7 +170,7 @@
     }
 
     async function fetchMessages() {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('messages')
             .select('*')
             .order('created_at', { ascending: true });
@@ -191,7 +184,7 @@
         const text = input.value.trim();
         if(!text) return;
 
-        const { error } = await supabase.from('messages').insert([{
+        const { error } = await supabaseClient.from('messages').insert([{
             sender: currentUser.username,
             tag: currentUser.tag,
             color: currentUser.color,
@@ -203,7 +196,7 @@
     }
 
     function listenForNewMessages() {
-        supabase
+        supabaseClient
             .channel('public:messages')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
                 fetchMessages();
