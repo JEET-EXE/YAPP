@@ -67,7 +67,7 @@
         @media (max-width: 768px) {
             body { padding: 0; overflow: hidden; }
             .app-container { width: 100vw; max-width: 100vw; height: 100vh; border-radius: 0; border: none; display: grid; grid-template-rows: auto 1fr; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #27272a; display: flex; flex-direction: column; }
+            .sidebar { width: 100%; height: auto; max-height: 140px; border-right: none; border-bottom: 1px solid #27272a; display: flex; flex-direction: column; }
             .current-user-tag { padding: 10px 16px; }
             .channels { padding: 8px; gap: 4px; max-height: 100px; }
             .dm-start { display: flex !important; padding: 8px 12px; border-top: 1px solid #27272a; } 
@@ -213,8 +213,8 @@
                 <div>${currentUser.username}<span>${currentUser.tag}</span></div>
             `;
 
-            // Load saved DM rooms for this specific account out of localStorage
-            const savedDms = localStorage.getItem(`yapp_dms_${currentUser.fullTag}`);
+            // Pull stored tabs specific to this user account
+            const savedDms = localStorage.getItem(`yapp_dms_${currentUser.fullTag.toLowerCase()}`);
             if(savedDms) {
                 activeDms = JSON.parse(savedDms);
             }
@@ -234,8 +234,9 @@
         }
     }
 
+    // Strict case-insensitive sorting handler to keep keys aligned
     function getRoomId(userA, userB) {
-        return [userA, userB].sort().join('_');
+        return [userA.toLowerCase(), userB.toLowerCase()].sort().join('_');
     }
 
     function handleDmTargetKey(e) {
@@ -249,14 +250,16 @@
         const targetInput = document.getElementById('dm-target-input');
         const targetUser = targetInput.value.trim();
         
-        if(!targetUser || targetUser === currentUser.fullTag) {
+        if(!targetUser || targetUser.toLowerCase() === currentUser.fullTag.toLowerCase()) {
             targetInput.value = '';
             return;
         }
 
-        if(!activeDms.includes(targetUser)) {
+        // Search match independently of casing strings
+        const exists = activeDms.some(val => val.toLowerCase() === targetUser.toLowerCase());
+        if(!exists) {
             activeDms.push(targetUser);
-            localStorage.setItem(`yapp_dms_${currentUser.fullTag}`, JSON.stringify(activeDms));
+            localStorage.setItem(`yapp_dms_${currentUser.fullTag.toLowerCase()}`, JSON.stringify(activeDms));
         }
 
         switchTab(getRoomId(currentUser.fullTag, targetUser), `💬 ${targetUser}`);
@@ -278,8 +281,8 @@
     }
 
     function switchTab(tabId, titleText = '🌍 global-yapp') {
-        currentTab = tabId;
-        document.getElementById('global-chan-btn').classList.toggle('active', tabId === 'global');
+        currentTab = tabId.toLowerCase();
+        document.getElementById('global-chan-btn').classList.toggle('active', currentTab === 'global');
         document.getElementById('chat-title-text').innerText = titleText;
         renderDmList();
         fetchMessages();
@@ -320,21 +323,22 @@
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
                 const newMsg = payload.new;
                 
-                // Dynamically spin up the private window tab if another yapper starts a conversation with us!
                 if (newMsg.room && newMsg.room !== 'global') {
-                    const structuralParts = newMsg.room.split('_');
-                    if (structuralParts.includes(currentUser.fullTag)) {
+                    const structuralParts = newMsg.room.toLowerCase().split('_');
+                    if (structuralParts.includes(currentUser.fullTag.toLowerCase())) {
                         const senderFullTag = `${newMsg.sender}${newMsg.tag}`;
-                        if (senderFullTag !== currentUser.fullTag && !activeDms.includes(senderFullTag)) {
+                        
+                        const exists = activeDms.some(val => val.toLowerCase() === senderFullTag.toLowerCase());
+                        if (senderFullTag.toLowerCase() !== currentUser.fullTag.toLowerCase() && !exists) {
                             activeDms.push(senderFullTag);
-                            localStorage.setItem(`yapp_dms_${currentUser.fullTag}`, JSON.stringify(activeDms));
+                            localStorage.setItem(`yapp_dms_${currentUser.fullTag.toLowerCase()}`, JSON.stringify(activeDms));
                             renderDmList();
                         }
                     }
                 }
 
-                const isGlobalMatch = currentTab === 'global' && (!newMsg.room || newMsg.room === 'global');
-                const isPrivateMatch = currentTab === newMsg.room;
+                const isGlobalMatch = currentTab === 'global' && (!newMsg.room || newMsg.room.toLowerCase() === 'global');
+                const isPrivateMatch = currentTab === (newMsg.room ? newMsg.room.toLowerCase() : '');
                 if (isGlobalMatch || isPrivateMatch) {
                     fetchMessages();
                 }
