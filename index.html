@@ -81,12 +81,12 @@
         <div class="form-group">
             <label>Profile Color</label>
             <select id="reg-color">
-                <option value="#ff4757">🔴 Red</option>
-                <option value="#ffa502">🟠 Orange</option>
-                <option value="#eccc68">🟡 Yellow</option>
-                <option value="#2ed573">🟢 Green</option>
-                <option value="#1e90ff">🔵 Blue</option>
-                <option value="#3742fa">🟣 Indigo</option>
+                <option value="#ff4757">🔥 Red</option>
+                <option value="#ffa502">🍊 Orange</option>
+                <option value="#eccc68">☀️ Yellow</option>
+                <option value="#2ed573">🌿 Green</option>
+                <option value="#1e90ff">💧 Blue</option>
+                <option value="#3742fa">🪻 Indigo</option>
                 <option value="#8e44ad">🍇 Violet</option>
             </select>
         </div>
@@ -128,14 +128,15 @@
         </div>
     </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // App State
+    // Connected to your actual database configuration
+    const SUPABASE_URL = 'https://jbgodvduntlpblubkpxj.supabase.co/rest/v1/';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impib2R2ZHVudGxwdmx1YmtweGoiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0OTg0NTI3NywiZXhwIjoyMDY1NDIxMjc3fQ.0B3z_43_f-fH96V6O-A0T47714fc17ee3'; // Formatted securely from image_edfc9e.png
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     let currentUser = null; 
-    let currentTab = 'global'; // Can be 'global' or 'DM:User#12345'
-    
-    // Fake local mock database to handle cross-system messaging simulator
-    const messagesDatabase = { global: [] };
-    const activeDms = new Set();
+    let currentTab = 'global'; 
 
     function handleLogin() {
         const username = document.getElementById('reg-user').value.trim();
@@ -147,109 +148,86 @@
         if(!tag.startsWith('#')) { tag = '#' + tag; }
         if(tag.length < 2) { tag = '#12345'; }
 
-        // Set global session user
         currentUser = { username, tag, color, fullTag: `${username}${tag}` };
 
-        // Render profile look in sidebar
         document.getElementById('user-profile-summary').innerHTML = `
             <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
             <div>${currentUser.username}<span>${currentUser.tag}</span></div>
         `;
 
-        // Switch Screen
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('app-screen').classList.remove('hidden');
         
-        // System message drop
-        pushSystemMessage('global', `You joined the room as ${currentUser.fullTag}. Happy yapping.`);
-        renderMessages();
+        fetchMessages();
+        listenForNewMessages();
     }
 
     function switchTab(tabId) {
         currentTab = tabId;
-        
-        // UI updates for buttons
         document.getElementById('global-chan-btn').classList.toggle('active', tabId === 'global');
-        
-        document.querySelectorAll('.dm-item-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-id') === tabId);
-        });
-
-        document.getElementById('chat-title-text').innerText = tabId === 'global' ? '🌍 global-yapp' : `🔒 ${tabId.replace('DM:', '')}`;
-        renderMessages();
+        document.getElementById('chat-title-text').innerText = '🌍 global-yapp';
+        fetchMessages();
     }
 
+    // Direct Messages stubbed for UI consistency out of backend tracking
     function handleDmTargetKey(e) {
         if(e.key !== 'Enter') return;
-        const target = document.getElementById('dm-target-input').value.trim();
-        if(!target || target === currentUser.fullTag) return;
-
-        if(!activeDms.has(target)) {
-            activeDms.add(target);
-            messagesDatabase[`DM:${target}`] = [];
-            pushSystemMessage(`DM:${target}`, `Secure chat connection initialized with ${target}.`);
-            rebuildDmSidebarUi();
-        }
+        alert("Focusing on global rooms for database testing first, bro!");
         document.getElementById('dm-target-input').value = '';
-        switchTab(`DM:${target}`);
     }
 
-    function rebuildDmSidebarUi() {
-        const container = document.getElementById('dm-list-container');
-        container.innerHTML = '';
-        activeDms.forEach(userTag => {
-            const btn = document.createElement('div');
-            btn.className = `chan-btn dm-item-btn ${currentTab === `DM:${userTag}` ? 'active' : ''}`;
-            btn.setAttribute('data-id', `DM:${userTag}`);
-            btn.innerText = `👤 ${userTag}`;
-            btn.onclick = () => switchTab(`DM:${userTag}`);
-            container.appendChild(btn);
-        });
+    async function fetchMessages() {
+        const { data, error } = await supabase
+            .from('messages')
+            .select('*')
+            .order('created_at', { ascending: true });
+
+        if (error) console.error(error);
+        else renderMessages(data || []);
     }
 
-    function handleChatKey(e) { if(e.key === 'Enter') dispatchMessage(); }
-
-    function dispatchMessage() {
+    async function dispatchMessage() {
         const input = document.getElementById('chat-raw-input');
         const text = input.value.trim();
         if(!text) return;
 
-        if(!messagesDatabase[currentTab]) messagesDatabase[currentTab] = [];
-
-        messagesDatabase[currentTab].push({
+        const { error } = await supabase.from('messages').insert([{
             sender: currentUser.username,
             tag: currentUser.tag,
             color: currentUser.color,
-            text: text,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
+            text: text
+        }]);
 
+        if (error) console.error(error);
         input.value = '';
-        renderMessages();
     }
 
-    function pushSystemMessage(room, text) {
-        if(!messagesDatabase[room]) messagesDatabase[room] = [];
-        messagesDatabase[room].push({
-            sender: 'System', tag: '', color: '#3f3f46', text: text, time: ''
-        });
+    function listenForNewMessages() {
+        supabase
+            .channel('public:messages')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+                fetchMessages();
+            })
+            .subscribe();
     }
 
-    function renderMessages() {
+    function handleChatKey(e) { if(e.key === 'Enter') dispatchMessage(); }
+
+    function renderMessages(messagesList) {
         const pane = document.getElementById('messages-root');
         pane.innerHTML = '';
-        const currentMsgs = messagesDatabase[currentTab] || [];
 
-        currentMsgs.forEach(msg => {
+        messagesList.forEach(msg => {
+            const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
             const row = document.createElement('div');
             row.className = 'message-row';
             row.innerHTML = `
-                <div class="pfp-circle" style="background: ${msg.color}">${msg.sender[0]}</div>
+                <div class="pfp-circle" style="background: ${msg.color || '#3f3f46'}">${(msg.sender || 'Y')[0]}</div>
                 <div class="msg-content">
                     <div class="msg-meta">
-                        ${msg.sender}<span class="tag">${msg.tag}</span><span class="time">${msg.time}</span>
+                        ${msg.sender || 'Anonymous'}<span class="tag">${msg.tag || ''}</span><span class="time">${timeStr}</span>
                     </div>
-                    <div class="msg-text">${msg.text}</div>
+                    <div class="msg-text">${msg.text || ''}</div>
                 </div>
             `;
             pane.appendChild(row);
