@@ -25,4 +25,15 @@
         .btn:hover { background: #e4e4e7; }
         
         /* Error Alert Message Styling */
-        .error-banner { background: #ef4444; color: white; padding: 10px; border-radius:
+        .error-banner { background: #ef4444; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; display: none; font-weight: 500; }
+
+        /* Main Layout */
+        .app-container { width: 100%; max-width: 900px; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; }
+        .current-user-tag { padding: 16px; border-bottom: 1px solid #27272a; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; }
+        .current-user-tag span { color: #a1a1aa; font-size: 0.8rem; font-weight: normal; }
+        .channels { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; }
+        .chan-btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; color: #a1a1aa; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .chan-btn:hover, .chan-btn.active { background: #27272a; color: #f
