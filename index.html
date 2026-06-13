@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yapp by Caviar Studios</title>
+    
+    <!-- 💎 MAGIC AUTO-GENERATED CAVIAR STUDIOS GOLD DIAMOND ICON -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background: #09090b; color: #f4f4f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
@@ -54,7 +58,7 @@
 
         /* Chat Area */
         .chat-main { flex: 1; display: flex; flex-direction: column; background: #0f0f11; min-height: 0; }
-        .chat-header { padding: 16px 20px; border-bottom: 1px solid #27272a; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+        .chat-header { padding: 16px 20px; border-bottom: 1px solid #27272a; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .messages-pane { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
         /* Message Layout */
@@ -91,6 +95,7 @@
 </head>
 <body>
 
+    <!-- LOGIN SCREEN -->
     <div class="auth-card" id="auth-screen">
         <h2>Welcome to Yapp</h2>
         <p>Stop talking, start yapping.</p>
@@ -124,6 +129,7 @@
         <button class="btn" id="login-btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
+    <!-- MAIN APP SCREEN -->
     <div class="app-container hidden" id="app-screen">
         <div class="sidebar">
             <div class="current-user-tag" id="user-profile-summary"></div>
@@ -147,7 +153,10 @@
         </div>
 
         <div class="chat-main">
-            <div class="chat-header" id="chat-title-text">🌍 global-yapp</div>
+            <div class="chat-header" id="chat-header-root">
+                <div id="chat-title-text">🌍 global-yapp</div>
+                <div id="admin-nuke-slot"></div>
+            </div>
             <div class="messages-pane" id="messages-root"></div>
             <div class="input-container">
                 <div class="input-wrapper">
@@ -233,6 +242,8 @@
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
             
+            evaluateAdminPermissions();
+            
             await autoDiscoverRooms();
             fetchMessages();
             listenForNewMessages();
@@ -242,6 +253,44 @@
             showError('Database error: ' + (err.message || 'Check your connections.'));
             loginBtn.innerText = "Login / Register";
             loginBtn.disabled = false;
+        }
+    }
+
+    function evaluateAdminPermissions() {
+        const nukeSlot = document.getElementById('admin-nuke-slot');
+        if(currentUser.fullTag.toLowerCase() === 'admin#67676') {
+            nukeSlot.innerHTML = `
+                <button onclick="nukeGlobalChatLog()" style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s;">
+                    💥 Nuke Global Chat
+                </button>
+            `;
+        } else {
+            nukeSlot.innerHTML = '';
+        }
+    }
+
+    async function nukeGlobalChatLog() {
+        const confirmGlobalNuke = confirm("⚠️ ADMIN COMMAND: Are you completely sure you want to delete ALL messages inside the Global Room? This cannot be undone!");
+        if(!confirmGlobalNuke) return;
+
+        try {
+            const { error: nullErr } = await supabaseClient
+                .from('messages')
+                .delete()
+                .is('room', null);
+
+            const { error: eqErr } = await supabaseClient
+                .from('messages')
+                .delete()
+                .eq('room', 'global');
+
+            if (nullErr || eqErr) throw (nullErr || eqErr);
+
+            alert("Global Chat successfully wiped clear! Space optimized. 🏎️💨");
+            fetchMessages();
+        } catch(err) {
+            console.error("Global wipe failed:", err);
+            alert("Failed to wipe database records.");
         }
     }
 
@@ -274,7 +323,6 @@
         }
     }
 
-    // Fixed dynamic lower-case mapping layers
     function getRoomId(userA, userB) {
         return [userA.toLowerCase(), userB.toLowerCase()].sort().join('_');
     }
@@ -354,6 +402,14 @@
         currentTab = tabId.toLowerCase();
         document.getElementById('global-chan-btn').classList.toggle('active', currentTab === 'global');
         document.getElementById('chat-title-text').innerText = titleText;
+        
+        const nukeSlot = document.getElementById('admin-nuke-slot');
+        if (currentTab === 'global' && currentUser.fullTag.toLowerCase() === 'admin#67676') {
+            nukeSlot.style.display = 'block';
+        } else {
+            nukeSlot.style.display = 'none';
+        }
+
         renderDmList();
         fetchMessages();
     }
@@ -423,6 +479,7 @@
 
     function handleChatKey(e) { if(e.key === 'Enter') dispatchMessage(); }
 
+    // Fixed rendering pipeline setup
     function renderMessages(messagesList) {
         const pane = document.getElementById('messages-root');
         pane.innerHTML = '';
