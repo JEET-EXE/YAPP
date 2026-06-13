@@ -213,16 +213,12 @@
                 <div>${currentUser.username}<span>${currentUser.tag}</span></div>
             `;
 
-            // Pull stored tabs specific to this user account
-            const savedDms = localStorage.getItem(`yapp_dms_${currentUser.fullTag.toLowerCase()}`);
-            if(savedDms) {
-                activeDms = JSON.parse(savedDms);
-            }
-
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
             
-            renderDmList();
+            // NEW: Auto-Discover active rooms from Supabase message history on load!
+            await autoDiscoverRooms();
+            
             fetchMessages();
             listenForNewMessages();
 
@@ -234,7 +230,38 @@
         }
     }
 
-    // Strict case-insensitive sorting handler to keep keys aligned
+    async function autoDiscoverRooms() {
+        try {
+            // Fetch any messages that contain our username in the room title string
+            const { data, error } = await supabaseClient
+                .from('messages')
+                .select('room, sender, tag')
+                .not('room', 'is', null)
+                .not('room', 'eq', 'global');
+
+            if (error) throw error;
+
+            const foundDms = new Set();
+            const lowerTag = currentUser.fullTag.toLowerCase();
+
+            (data || []).forEach(msg => {
+                const r = msg.room.toLowerCase();
+                const parts = r.split('_');
+                if (parts.includes(lowerTag)) {
+                    // Extract the opponent's name from the string block
+                    const opponent = parts.find(p => p !== lowerTag);
+                    if (opponent) foundDms.add(opponent);
+                }
+            });
+
+            // Sync down to the current session array map
+            activeDms = Array.from(foundDms);
+            renderDmList();
+        } catch(e) {
+            console.error("Auto-discovery failed:", e);
+        }
+    }
+
     function getRoomId(userA, userB) {
         return [userA.toLowerCase(), userB.toLowerCase()].sort().join('_');
     }
@@ -255,11 +282,9 @@
             return;
         }
 
-        // Search match independently of casing strings
         const exists = activeDms.some(val => val.toLowerCase() === targetUser.toLowerCase());
         if(!exists) {
-            activeDms.push(targetUser);
-            localStorage.setItem(`yapp_dms_${currentUser.fullTag.toLowerCase()}`, JSON.stringify(activeDms));
+            activeDms.push(targetUser.toLowerCase());
         }
 
         switchTab(getRoomId(currentUser.fullTag, targetUser), `💬 ${targetUser}`);
@@ -326,12 +351,11 @@
                 if (newMsg.room && newMsg.room !== 'global') {
                     const structuralParts = newMsg.room.toLowerCase().split('_');
                     if (structuralParts.includes(currentUser.fullTag.toLowerCase())) {
-                        const senderFullTag = `${newMsg.sender}${newMsg.tag}`;
+                        const senderFullTag = `${newMsg.sender}${newMsg.tag}`.toLowerCase();
                         
-                        const exists = activeDms.some(val => val.toLowerCase() === senderFullTag.toLowerCase());
-                        if (senderFullTag.toLowerCase() !== currentUser.fullTag.toLowerCase() && !exists) {
+                        const exists = activeDms.some(val => val.toLowerCase() === senderFullTag);
+                        if (senderFullTag !== currentUser.fullTag.toLowerCase() && !exists) {
                             activeDms.push(senderFullTag);
-                            localStorage.setItem(`yapp_dms_${currentUser.fullTag.toLowerCase()}`, JSON.stringify(activeDms));
                             renderDmList();
                         }
                     }
