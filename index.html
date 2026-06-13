@@ -210,9 +210,16 @@
                 <div>${currentUser.username}<span>${currentUser.tag}</span></div>
             `;
 
+            // Load persistent chatroom tabs specific to this full user tag
+            const savedDms = localStorage.getItem(`yapp_dms_${currentUser.fullTag}`);
+            if(savedDms) {
+                activeDms = JSON.parse(savedDms);
+            }
+
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
             
+            renderDmList();
             fetchMessages();
             listenForNewMessages();
 
@@ -224,7 +231,6 @@
         }
     }
 
-    // Creates a unique, sorted string ID for a 2-person secret room
     function getRoomId(userA, userB) {
         return [userA, userB].sort().join('_');
     }
@@ -241,7 +247,7 @@
 
         if(!activeDms.includes(targetUser)) {
             activeDms.push(targetUser);
-            renderDmList();
+            localStorage.setItem(`yapp_dms_${currentUser.fullTag}`, JSON.stringify(activeDms));
         }
 
         switchTab(getRoomId(currentUser.fullTag, targetUser), `💬 ${targetUser}`);
@@ -272,14 +278,11 @@
 
     async function fetchMessages() {
         let query = supabaseClient.from('messages').select('*');
-        
-        // Unlocked Room Filter Logic
         if (currentTab === 'global') {
             query = query.or('room.is.null,room.eq.global');
         } else {
             query = query.eq('room', currentTab);
         }
-        
         const { data, error } = await query.order('created_at', { ascending: true });
         if (error) console.error(error);
         else renderMessages(data || []);
@@ -295,7 +298,7 @@
             tag: currentUser.tag,
             color: currentUser.color,
             text: text,
-            room: currentTab // Tag message with target room ID context
+            room: currentTab
         }]);
 
         if (error) console.error(error);
@@ -307,9 +310,23 @@
             .channel('public:messages')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
                 const newMsg = payload.new;
+                
+                // Real-time automatic tab initialization if someone sends you an incoming private message!
+                if (newMsg.room && newMsg.room !== 'global') {
+                    const structuralParts = newMsg.room.split('_');
+                    if (structuralParts.includes(currentUser.fullTag)) {
+                        // Find who texted us
+                        const senderFullTag = `${newMsg.sender}${newMsg.tag}`;
+                        if (senderFullTag !== currentUser.fullTag && !activeDms.includes(senderFullTag)) {
+                            activeDms.push(senderFullTag);
+                            localStorage.setItem(`yapp_dms_${currentUser.fullTag}`, JSON.stringify(activeDms));
+                            renderDmList();
+                        }
+                    }
+                }
+
                 const isGlobalMatch = currentTab === 'global' && (!newMsg.room || newMsg.room === 'global');
                 const isPrivateMatch = currentTab === newMsg.room;
-                
                 if (isGlobalMatch || isPrivateMatch) {
                     fetchMessages();
                 }
