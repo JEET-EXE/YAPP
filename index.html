@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yapp by Caviar Studios</title>
     
-    <!-- 💎 MAGIC AUTO-GENERATED CAVIAR STUDIOS GOLD DIAMOND ICON -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
 
     <style>
@@ -106,7 +105,6 @@
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
     <div class="auth-card" id="auth-screen">
         <h2>Welcome to Yapp</h2>
         <p>Stop talking, start yapping.</p>
@@ -140,10 +138,8 @@
         <button class="btn" id="login-btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
-    <!-- MAIN APP SCREEN -->
     <div class="app-container hidden" id="app-screen">
         
-        <!-- DESKTOP SIDEBAR -->
         <div class="sidebar">
             <div class="current-user-tag" id="user-profile-summary"></div>
             <div class="channels">
@@ -165,10 +161,8 @@
             </div>
         </div>
 
-        <!-- MAIN CHAT INTERFACE -->
         <div class="chat-main">
             
-            <!-- MOBILE CHATS OVERLAY MODAL -->
             <div class="mobile-modal" id="chats-overlay-modal">
                 <div class="modal-header">
                     <h3 style="font-size: 1.1rem; font-weight: bold;">Direct Messages</h3>
@@ -197,7 +191,6 @@
                 </div>
             </div>
 
-            <!-- Mobile Bottom Bar Navigation Framework -->
             <div class="mobile-nav-bar">
                 <div class="nav-item active" id="mobile-nav-global" onclick="handleMobileNavClick('global')">
                     <span>🌍</span>
@@ -248,17 +241,19 @@
         loginBtn.disabled = true;
 
         try {
+            // 🛠️ FIX: Query using BOTH username AND tag to prevent login impersonation hijacks
             const { data: userExists, error: fetchError } = await supabaseClient
                 .from('users')
                 .select('*')
                 .eq('username', username)
+                .eq('tag', tag)
                 .maybeSingle();
 
             if (fetchError) throw fetchError;
 
             if (userExists) {
                 if (userExists.password !== pass) {
-                    showError('❌ Wrong password for this username, bro!');
+                    showError('❌ Wrong password for this account, bro!');
                     loginBtn.innerText = "Login / Register";
                     loginBtn.disabled = false;
                     return;
@@ -270,6 +265,8 @@
                     fullTag: `${userExists.username}${userExists.tag}` 
                 };
             } else {
+                // Double check that the username isn't taken with a DIFFERENT tag if we want tight checks, 
+                // but standard discord style allows same names with unique tags. Let's register it uniquely!
                 const { error: insertError } = await supabaseClient
                     .from('users')
                     .insert([{ username, password: pass, tag, color }]);
@@ -593,8 +590,6 @@
             
             const isMyOwnMessage = (msg.sender === currentUser.username && msg.tag === currentUser.tag);
             const isNotGlobalRoom = (currentTab !== 'global');
-            
-            // ✨ THE MODERATION LOGIC: Show delete button if it's your own message in DMs OR if you are the omnipotent Admin account anywhere!
             const isAdminSession = (currentUser.fullTag.toLowerCase() === 'admin#67676');
             
             let deleteButtonHtml = '';
