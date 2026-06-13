@@ -6,21 +6,20 @@
     <title>Yapp</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: #09090b; color: #f4f4f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        body { background: #09090b; color: #f4f4f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
         
         /* Utility Classes */
         .hidden { display: none !important; }
         .pfp-circle { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: white; text-transform: uppercase; }
 
-        /* Login Screen - Always Centered */
-        .auth-card { background: #18181b; padding: 30px; border-radius: 12px; width: 100%; max-width: 380px; border: 1px solid #27272a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin: auto; }
+        /* Login Screen */
+        .auth-card { background: #18181b; padding: 30px; border-radius: 12px; width: 100%; max-width: 380px; border: 1px solid #27272a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .auth-card h2 { text-align: center; margin-bottom: 6px; font-size: 1.6rem; letter-spacing: -0.5px; }
         .auth-card p { text-align: center; color: #a1a1aa; font-size: 0.85rem; margin-bottom: 24px; }
         .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
         .form-row { display: flex; gap: 10px; }
         label { font-size: 0.8rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: 0.2s; width: 100%; }
-        .form-row input { width: auto; }
+        input, select { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: 0.2s; }
         input:focus, select:focus { border-color: #a1a1aa; }
         .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; margin-top: 10px; width: 100%; transition: 0.2s; }
         .btn:hover { background: #e4e4e7; }
@@ -32,7 +31,7 @@
         .app-container { width: 100%; max-width: 900px; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         
         /* Sidebar */
-        .sidebar { width: 260px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar { width: 260px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; }
         .current-user-tag { padding: 16px; border-bottom: 1px solid #27272a; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; }
         .current-user-tag span { color: #a1a1aa; font-size: 0.8rem; font-weight: normal; }
         .channels { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; }
@@ -44,13 +43,13 @@
         .dm-start input { padding: 6px 8px; font-size: 0.8rem; }
 
         /* Chat Area */
-        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0f0f11; min-width: 0; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0f0f11; }
         .chat-header { padding: 16px 20px; border-bottom: 1px solid #27272a; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
         .messages-pane { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
         /* Message Layout */
         .message-row { display: flex; gap: 12px; align-items: flex-start; }
-        .msg-content { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .msg-content { display: flex; flex-direction: column; gap: 3px; }
         .msg-meta { font-size: 0.85rem; font-weight: 600; color: #f4f4f5; }
         .msg-meta .tag { color: #71717a; font-weight: normal; font-size: 0.75rem; }
         .msg-meta .time { color: #52525b; font-weight: normal; font-size: 0.75rem; margin-left: 6px; }
@@ -59,18 +58,19 @@
         /* Input Bar */
         .input-container { padding: 20px; background: #0f0f11; }
         .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; }
-        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; }
+        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; }
+        .input-wrapper input:focus { border: none; }
         .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
         .input-wrapper button:hover { color: #f4f4f5; }
 
-        /* Mobile Viewport Fixes */
+        /* Mobile Responsive UI Overrides */
         @media (max-width: 768px) {
-            body { padding: 0; }
-            .app-container { width: 100vw; max-width: 100%; height: 100vh; border-radius: 0; border: none; flex-direction: column; }
-            .sidebar { width: 100%; height: auto; max-height: 110px; border-right: none; border-bottom: 1px solid #27272a; }
-            .dm-start { display: none !important; }
-            .chat-main { flex: 1; height: calc(100% - 110px); }
-            .messages-pane { padding: 12px; gap: 10px; }
+            body { padding: 10px; height: 100vh; overflow: hidden; }
+            .app-container { height: 100%; flex-direction: column; }
+            .sidebar { width: 100%; height: auto; max-height: 140px; border-right: none; border-bottom: 1px solid #27272a; }
+            .dm-start { display: none; } 
+            .chat-main { flex: 1; height: calc(100% - 140px); }
+            .messages-pane { padding: 12px; gap: 12px; }
             .input-container { padding: 12px; }
         }
     </style>
@@ -111,10 +111,13 @@
 
     <div class="app-container hidden" id="app-screen">
         <div class="sidebar">
-            <div class="current-user-tag" id="user-profile-summary"></div>
+            <div class="current-user-tag" id="user-profile-summary">
+                </div>
             <div class="channels">
                 <div class="chan-btn active" id="global-chan-btn" onclick="switchTab('global')">🌍 global-yapp</div>
-                <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;"></div>
+                <div style="font-size: 0.75rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; margin: 15px 0 5px 10px; font-weight: bold;">Direct Messages</div>
+                <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;">
+                    </div>
             </div>
             <div class="dm-start">
                 <label>Start Private DM</label>
@@ -124,7 +127,8 @@
 
         <div class="chat-main">
             <div class="chat-header" id="chat-title-text">🌍 global-yapp</div>
-            <div class="messages-pane" id="messages-root"></div>
+            <div class="messages-pane" id="messages-root">
+                </div>
             <div class="input-container">
                 <div class="input-wrapper">
                     <input type="text" id="chat-raw-input" placeholder="Message..." onkeypress="handleChatKey(event)">
@@ -169,6 +173,7 @@
         loginBtn.disabled = true;
 
         try {
+            // 1. Check if user already exists
             const { data: userExists, error: fetchError } = await supabaseClient
                 .from('users')
                 .select('*')
@@ -178,6 +183,7 @@
             if (fetchError) throw fetchError;
 
             if (userExists) {
+                // Verify password
                 if (userExists.password !== pass) {
                     showError('❌ Wrong password for this username, bro!');
                     loginBtn.innerText = "Login / Register";
@@ -190,4 +196,108 @@
                     color: userExists.color, 
                     fullTag: `${userExists.username}${userExists.tag}` 
                 };
+            } else {
+                // Register fresh account
+                const { error: insertError } = await supabaseClient
+                    .from('users')
+                    .insert([{ username, password: pass, tag, color }]);
+
+                if (insertError) throw insertError;
+
+                currentUser = { username, tag, color, fullTag: `${username}${tag}` };
             }
+
+            // 2. Successful Auth -> Transition UI Screen
+            document.getElementById('user-profile-summary').innerHTML = `
+                <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
+                <div>${currentUser.username}<span>${currentUser.tag}</span></div>
+            `;
+
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            
+            fetchMessages();
+            listenForNewMessages();
+
+        } catch (err) {
+            console.error(err);
+            showError('Database error: ' + (err.message || 'Check your connections.'));
+            loginBtn.innerText = "Login / Register";
+            loginBtn.disabled = false;
+        }
+    }
+
+    function switchTab(tabId) {
+        currentTab = tabId;
+        document.getElementById('global-chan-btn').classList.toggle('active', tabId === 'global');
+        document.getElementById('chat-title-text').innerText = '🌍 global-yapp';
+        fetchMessages();
+    }
+
+    function handleDmTargetKey(e) {
+        if(e.key !== 'Enter') return;
+        alert("Focusing on global rooms for database testing first, bro!");
+        document.getElementById('dm-target-input').value = '';
+    }
+
+    async function fetchMessages() {
+        const { data, error } = await supabaseClient
+            .from('messages')
+            .select('*')
+            .order('created_at', { ascending: true });
+
+        if (error) console.error(error);
+        else renderMessages(data || []);
+    }
+
+    async function dispatchMessage() {
+        const input = document.getElementById('chat-raw-input');
+        const text = input.value.trim();
+        if(!text) return;
+
+        const { error } = await supabaseClient.from('messages').insert([{
+            sender: currentUser.username,
+            tag: currentUser.tag,
+            color: currentUser.color,
+            text: text
+        }]);
+
+        if (error) console.error(error);
+        input.value = '';
+    }
+
+    function listenForNewMessages() {
+        supabaseClient
+            .channel('public:messages')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+                fetchMessages();
+            })
+            .subscribe();
+    }
+
+    function handleChatKey(e) { if(e.key === 'Enter') dispatchMessage(); }
+
+    function renderMessages(messagesList) {
+        const pane = document.getElementById('messages-root');
+        pane.innerHTML = '';
+
+        messagesList.forEach(msg => {
+            const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            const row = document.createElement('div');
+            row.className = 'message-row';
+            row.innerHTML = `
+                <div class="pfp-circle" style="background: ${msg.color || '#3f3f46'}">${(msg.sender || 'Y')[0]}</div>
+                <div class="msg-content">
+                    <div class="msg-meta">
+                        ${msg.sender || 'Anonymous'}<span class="tag">${msg.tag || ''}</span><span class="time">${timeStr}</span>
+                    </div>
+                    <div class="msg-text">${msg.text || ''}</div>
+                </div>
+            `;
+            pane.appendChild(row);
+        });
+        pane.scrollTop = pane.scrollHeight;
+    }
+</script>
+</body>
+</html>
