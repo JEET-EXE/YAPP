@@ -27,20 +27,20 @@
         /* Error Alert Message Styling */
         .error-banner { background: #ef4444; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; display: none; font-weight: 500; }
 
-        /* Main Layout - Fixed max-width to let it scale completely */
+        /* Main Layout */
         .app-container { width: 100%; max-width: 100%; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         
         /* Sidebar */
         .sidebar { width: 260px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; }
         .current-user-tag { padding: 16px; border-bottom: 1px solid #27272a; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; }
         .current-user-tag span { color: #a1a1aa; font-size: 0.8rem; font-weight: normal; }
-        .channels { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; }
+        .channels { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
         .chan-btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; color: #a1a1aa; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .chan-btn:hover, .chan-btn.active { background: #27272a; color: #f4f4f5; }
         
         /* DM Creator Form inside Sidebar */
-        .dm-start { padding: 12px; border-top: 1px solid #27272a; display: flex; flex-direction: column; gap: 8px; }
-        .dm-start input { padding: 6px 8px; font-size: 0.8rem; }
+        .dm-start { padding: 12px; border-top: 1px solid #27272a; display: flex; flex-direction: column; gap: 8px; background: #18181b; }
+        .dm-start input { padding: 6px 8px; font-size: 0.8rem; width: 100%; }
 
         /* Chat Area */
         .chat-main { flex: 1; display: flex; flex-direction: column; background: #0f0f11; }
@@ -58,18 +58,17 @@
         /* Input Bar */
         .input-container { padding: 20px; background: #0f0f11; }
         .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; }
-        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; }
-        .input-wrapper input:focus { border: none; }
+        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; }
         .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
         .input-wrapper button:hover { color: #f4f4f5; }
 
-        /* Mobile Responsive UI Overrides - Completely tuned to stack fluidly */
+        /* Mobile Responsive UI Overrides - Keeping the DM bar accessible now */
         @media (max-width: 768px) {
             body { padding: 0; height: 100vh; overflow: hidden; }
             .app-container { width: 100vw; max-width: 100%; height: 100vh; border-radius: 0; border: none; flex-direction: column; }
-            .sidebar { width: 100%; height: auto; max-height: 110px; border-right: none; border-bottom: 1px solid #27272a; }
-            .dm-start { display: none !important; } 
-            .chat-main { flex: 1; height: calc(100% - 110px); }
+            .sidebar { width: 100%; height: auto; max-height: 180px; border-right: none; border-bottom: 1px solid #27272a; }
+            .dm-start { display: flex !important; padding: 8px 12px; border-top: 1px solid #27272a; } 
+            .chat-main { flex: 1; height: calc(100% - 180px); }
             .messages-pane { padding: 12px; gap: 12px; }
             .input-container { padding: 12px; }
         }
@@ -111,13 +110,11 @@
 
     <div class="app-container hidden" id="app-screen">
         <div class="sidebar">
-            <div class="current-user-tag" id="user-profile-summary">
-                </div>
+            <div class="current-user-tag" id="user-profile-summary"></div>
             <div class="channels">
                 <div class="chan-btn active" id="global-chan-btn" onclick="switchTab('global')">🌍 global-yapp</div>
                 <div style="font-size: 0.75rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; margin: 15px 0 5px 10px; font-weight: bold;">Direct Messages</div>
-                <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;">
-                    </div>
+                <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;"></div>
             </div>
             <div class="dm-start">
                 <label>Start Private DM</label>
@@ -127,8 +124,7 @@
 
         <div class="chat-main">
             <div class="chat-header" id="chat-title-text">🌍 global-yapp</div>
-            <div class="messages-pane" id="messages-root">
-                </div>
+            <div class="messages-pane" id="messages-root"></div>
             <div class="input-container">
                 <div class="input-wrapper">
                     <input type="text" id="chat-raw-input" placeholder="Message..." onkeypress="handleChatKey(event)">
@@ -145,7 +141,8 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null; 
-    let currentTab = 'global'; 
+    let currentTab = 'global'; // Can be 'global' or a specific room ID string
+    let activeDms = []; // Array of targets like ['User#12345']
 
     function showError(text) {
         const errBox = document.getElementById('error-message');
@@ -173,7 +170,6 @@
         loginBtn.disabled = true;
 
         try {
-            // 1. Check if user already exists
             const { data: userExists, error: fetchError } = await supabaseClient
                 .from('users')
                 .select('*')
@@ -183,7 +179,6 @@
             if (fetchError) throw fetchError;
 
             if (userExists) {
-                // Verify password
                 if (userExists.password !== pass) {
                     showError('❌ Wrong password for this username, bro!');
                     loginBtn.innerText = "Login / Register";
@@ -197,7 +192,6 @@
                     fullTag: `${userExists.username}${userExists.tag}` 
                 };
             } else {
-                // Register fresh account
                 const { error: insertError } = await supabaseClient
                     .from('users')
                     .insert([{ username, password: pass, tag, color }]);
@@ -207,7 +201,6 @@
                 currentUser = { username, tag, color, fullTag: `${username}${tag}` };
             }
 
-            // 2. Successful Auth -> Transition UI Screen
             document.getElementById('user-profile-summary').innerHTML = `
                 <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
                 <div>${currentUser.username}<span>${currentUser.tag}</span></div>
@@ -227,24 +220,68 @@
         }
     }
 
-    function switchTab(tabId) {
-        currentTab = tabId;
-        document.getElementById('global-chan-btn').classList.toggle('active', tabId === 'global');
-        document.getElementById('chat-title-text').innerText = '🌍 global-yapp';
-        fetchMessages();
+    // Handles picking a unique, sorted room string for 2 players
+    function getRoomId(userA, userB) {
+        return [userA, userB].sort().join('_');
     }
 
     function handleDmTargetKey(e) {
         if(e.key !== 'Enter') return;
-        alert("Focusing on global rooms for database testing first, bro!");
-        document.getElementById('dm-target-input').value = '';
+        const targetInput = document.getElementById('dm-target-input');
+        const targetUser = targetInput.value.trim();
+        
+        if(!targetUser || targetUser === currentUser.fullTag) {
+            targetInput.value = '';
+            return;
+        }
+
+        if(!activeDms.includes(targetUser)) {
+            activeDms.push(targetUser);
+            renderDmList();
+        }
+
+        switchTab(getRoomId(currentUser.fullTag, targetUser), `💬 ${targetUser}`);
+        targetInput.value = '';
+    }
+
+    function renderDmList() {
+        const container = document.getElementById('dm-list-container');
+        container.innerHTML = '';
+        
+        activeDms.forEach(user => {
+            const roomId = getRoomId(currentUser.fullTag, user);
+            const btn = document.createElement('div');
+            btn.className = `chan-btn ${currentTab === roomId ? 'active' : ''}`;
+            btn.innerText = `💬 ${user}`;
+            btn.onclick = () => switchTab(roomId, `💬 ${user}`);
+            container.appendChild(btn);
+        });
+    }
+
+    function switchTab(tabId, titleText = '🌍 global-yapp') {
+        currentTab = tabId;
+        
+        // Handle visual highlights
+        document.getElementById('global-chan-btn').classList.toggle('active', tabId === 'global');
+        document.getElementById('chat-title-text').innerText = titleText;
+        
+        renderDmList();
+        fetchMessages();
     }
 
     async function fetchMessages() {
-        const { data, error } = await supabaseClient
-            .from('messages')
-            .select('*')
-            .order('created_at', { ascending: true });
+        // Query messages matching the current room context
+        let query = supabaseClient.from('messages').select('*');
+        
+        if (currentTab === 'global') {
+            // Filter messages where room is null or 'global'
+            query = query.or('room.is.null,room.eq.global');
+        } else {
+            // Filter for exact private room string id
+            query = query.eq('room', currentTab);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: true });
 
         if (error) console.error(error);
         else renderMessages(data || []);
@@ -259,7 +296,8 @@
             sender: currentUser.username,
             tag: currentUser.tag,
             color: currentUser.color,
-            text: text
+            text: text,
+            room: currentTab // Saves room context down to Supabase!
         }]);
 
         if (error) console.error(error);
@@ -270,7 +308,14 @@
         supabaseClient
             .channel('public:messages')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-                fetchMessages();
+                // If the message context matches our active view, pull updates live!
+                const newMsg = payload.new;
+                const isGlobalMatch = currentTab === 'global' && (!newMsg.room || newMsg.room === 'global');
+                const isPrivateMatch = currentTab === newMsg.room;
+                
+                if (isGlobalMatch || isPrivateMatch) {
+                    fetchMessages();
+                }
             })
             .subscribe();
     }
