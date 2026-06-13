@@ -35,9 +35,16 @@
         .current-user-tag { padding: 16px; border-bottom: 1px solid #27272a; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; }
         .current-user-tag span { color: #a1a1aa; font-size: 0.8rem; font-weight: normal; }
         .channels { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
-        .chan-btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; color: #a1a1aa; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .chan-btn:hover, .chan-btn.active { background: #27272a; color: #f4f4f5; }
         
+        /* Standard Channel Row Framework */
+        .chan-btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; color: #a1a1aa; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: 0.2s; }
+        .chan-btn:hover, .chan-btn.active { background: #27272a; color: #f4f4f5; }
+        .chan-left { display: flex; align-items: center; gap: 8px; min-width: 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+        
+        /* Sneaky Delete Button Hover Action */
+        .nuke-room-trigger { color: #71717a; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; transition: 0.15s; font-weight: bold; }
+        .nuke-room-trigger:hover { background: #ef4444; color: white; }
+
         /* DM Creator Form inside Sidebar */
         .dm-start { padding: 12px; border-top: 1px solid #27272a; display: flex; flex-direction: column; gap: 8px; background: #18181b; }
         .dm-start input { padding: 6px 8px; font-size: 0.8rem; }
@@ -67,7 +74,7 @@
         @media (max-width: 768px) {
             body { padding: 0; overflow: hidden; }
             .app-container { width: 100vw; max-width: 100vw; height: 100vh; border-radius: 0; border: none; display: grid; grid-template-rows: auto 1fr; }
-            .sidebar { width: 100%; height: auto; max-height: 140px; border-right: none; border-bottom: 1px solid #27272a; display: flex; flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #27272a; display: flex; flex-direction: column; }
             .current-user-tag { padding: 10px 16px; }
             .channels { padding: 8px; gap: 4px; max-height: 100px; }
             .dm-start { display: flex !important; padding: 8px 12px; border-top: 1px solid #27272a; } 
@@ -116,7 +123,9 @@
         <div class="sidebar">
             <div class="current-user-tag" id="user-profile-summary"></div>
             <div class="channels">
-                <div class="chan-btn active" id="global-chan-btn" onclick="switchTab('global', '🌍 global-yapp')">🌍 global-yapp</div>
+                <div class="chan-btn active" id="global-chan-btn" onclick="switchTab('global', '🌍 global-yapp')">
+                    <div class="chan-left">🌍 global-yapp</div>
+                </div>
                 <div style="font-size: 0.75rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; margin: 15px 0 5px 10px; font-weight: bold;">Direct Messages</div>
                 <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;"></div>
             </div>
@@ -216,9 +225,7 @@
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
             
-            // NEW: Auto-Discover active rooms from Supabase message history on load!
             await autoDiscoverRooms();
-            
             fetchMessages();
             listenForNewMessages();
 
@@ -232,10 +239,9 @@
 
     async function autoDiscoverRooms() {
         try {
-            // Fetch any messages that contain our username in the room title string
             const { data, error } = await supabaseClient
                 .from('messages')
-                .select('room, sender, tag')
+                .select('room')
                 .not('room', 'is', null)
                 .not('room', 'eq', 'global');
 
@@ -248,13 +254,11 @@
                 const r = msg.room.toLowerCase();
                 const parts = r.split('_');
                 if (parts.includes(lowerTag)) {
-                    // Extract the opponent's name from the string block
                     const opponent = parts.find(p => p !== lowerTag);
                     if (opponent) foundDms.add(opponent);
                 }
             });
 
-            // Sync down to the current session array map
             activeDms = Array.from(foundDms);
             renderDmList();
         } catch(e) {
@@ -291,6 +295,37 @@
         targetInput.value = '';
     }
 
+    // NUKE ROOM ENGINE: Erases message logs directly from Supabase DB
+    async function nukeChatRoom(targetUser, event) {
+        event.stopPropagation(); // Stops the sidebar row click from triggering
+        
+        const targetRoom = getRoomId(currentUser.fullTag, targetUser);
+        const confirmNuke = confirm(`⚠️ Yo, you sure? This will delete ALL messages inside this chat for everyone!`);
+        if(!confirmNuke) return;
+
+        try {
+            const { error } = await supabaseClient
+                .from('messages')
+                .delete()
+                .eq('room', targetRoom);
+
+            if (error) throw error;
+
+            // Remove room locally and update sidebar list view
+            activeDms = activeDms.filter(u => u.toLowerCase() !== targetUser.toLowerCase());
+            
+            // Switch back to global room view safely if you delete your current active tab
+            if (currentTab === targetRoom) {
+                switchTab('global', '🌍 global-yapp');
+            } else {
+                renderDmList();
+            }
+        } catch (err) {
+            console.error("Could not delete room:", err);
+            alert("DB Error wiping text layers. Check logs!");
+        }
+    }
+
     function renderDmList() {
         const container = document.getElementById('dm-list-container');
         container.innerHTML = '';
@@ -299,8 +334,13 @@
             const roomId = getRoomId(currentUser.fullTag, user);
             const btn = document.createElement('div');
             btn.className = `chan-btn ${currentTab === roomId ? 'active' : ''}`;
-            btn.innerText = `💬 ${user}`;
             btn.onclick = () => switchTab(roomId, `💬 ${user}`);
+            
+            // Appends the layout left and the dangerous action tag on the right side
+            btn.innerHTML = `
+                <div class="chan-left">💬 ${user}</div>
+                <div class="nuke-room-trigger" onclick="nukeChatRoom('${user}', event)">✕</div>
+            `;
             container.appendChild(btn);
         });
     }
@@ -345,26 +385,34 @@
     function listenForNewMessages() {
         supabaseClient
             .channel('public:messages')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-                const newMsg = payload.new;
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, (payload) => {
                 
-                if (newMsg.room && newMsg.room !== 'global') {
-                    const structuralParts = newMsg.room.toLowerCase().split('_');
-                    if (structuralParts.includes(currentUser.fullTag.toLowerCase())) {
-                        const senderFullTag = `${newMsg.sender}${newMsg.tag}`.toLowerCase();
-                        
-                        const exists = activeDms.some(val => val.toLowerCase() === senderFullTag);
-                        if (senderFullTag !== currentUser.fullTag.toLowerCase() && !exists) {
-                            activeDms.push(senderFullTag);
-                            renderDmList();
-                        }
-                    }
+                // Real-time deletion tracker: if a room was nuked by someone else, sync sidebars instantly!
+                if (payload.eventType === 'DELETE') {
+                    autoDiscoverRooms();
+                    fetchMessages();
+                    return;
                 }
 
-                const isGlobalMatch = currentTab === 'global' && (!newMsg.room || newMsg.room.toLowerCase() === 'global');
-                const isPrivateMatch = currentTab === (newMsg.room ? newMsg.room.toLowerCase() : '');
-                if (isGlobalMatch || isPrivateMatch) {
-                    fetchMessages();
+                if (payload.eventType === 'INSERT') {
+                    const newMsg = payload.new;
+                    if (newMsg.room && newMsg.room !== 'global') {
+                        const structuralParts = newMsg.room.toLowerCase().split('_');
+                        if (structuralParts.includes(currentUser.fullTag.toLowerCase())) {
+                            const senderFullTag = `${newMsg.sender}${newMsg.tag}`.toLowerCase();
+                            const exists = activeDms.some(val => val.toLowerCase() === senderFullTag);
+                            if (senderFullTag !== currentUser.fullTag.toLowerCase() && !exists) {
+                                activeDms.push(senderFullTag);
+                                renderDmList();
+                            }
+                        }
+                    }
+
+                    const isGlobalMatch = currentTab === 'global' && (!newMsg.room || newMsg.room.toLowerCase() === 'global');
+                    const isPrivateMatch = currentTab === (newMsg.room ? newMsg.room.toLowerCase() : '');
+                    if (isGlobalMatch || isPrivateMatch) {
+                        fetchMessages();
+                    }
                 }
             })
             .subscribe();
