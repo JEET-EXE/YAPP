@@ -23,6 +23,9 @@
         input:focus, select:focus { border-color: #a1a1aa; }
         .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; margin-top: 10px; width: 100%; transition: 0.2s; }
         .btn:hover { background: #e4e4e7; }
+        
+        /* Error Alert Message Styling */
+        .error-banner { background: #ef4444; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; display: none; font-weight: 500; }
 
         /* Main Layout */
         .app-container { width: 100%; max-width: 900px; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
@@ -66,6 +69,9 @@
     <div class="auth-card" id="auth-screen">
         <h2>Welcome to Yapp</h2>
         <p>Stop talking, start yapping.</p>
+        
+        <div id="error-message" class="error-banner"></div>
+
         <div class="form-group">
             <label>Username</label>
             <div class="form-row">
@@ -89,7 +95,7 @@
                 <option value="#8e44ad">🍇 Violet</option>
             </select>
         </div>
-        <button class="btn" onclick="handleLogin()">Login / Register</button>
+        <button class="btn" id="login-btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
     <div class="app-container hidden" id="app-screen">
@@ -123,37 +129,93 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    const SUPABASE_URL = 'https://jbgodvduntlpblubkpxj.supabase.co/rest/v1/';
+    // URL fixed (no double path nesting)
+    const SUPABASE_URL = 'https://jbgodvduntlpblubkpxj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impib2R2ZHVudGxwdmx1YmtweGoiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0OTg0NTI3NywiZXhwIjoyMDY1NDIxMjc3fQ.0B3z_43_f-fH96V6O-A0T47714fc17ee3'; 
-    
-    // Fixed declaration duplication error
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null; 
     let currentTab = 'global'; 
 
-    function handleLogin() {
+    function showError(text) {
+        const errBox = document.getElementById('error-message');
+        errBox.innerText = text;
+        errBox.style.display = 'block';
+    }
+
+    function clearError() {
+        document.getElementById('error-message').style.display = 'none';
+    }
+
+    async function handleLogin() {
+        clearError();
         const username = document.getElementById('reg-user').value.trim();
         let tag = document.getElementById('reg-tag').value.trim();
         const pass = document.getElementById('reg-pass').value;
         const color = document.getElementById('reg-color').value;
 
-        if(!username || !pass) { alert('Fill in your details, bro!'); return; }
+        if(!username || !pass) { showError('Fill in your details, bro!'); return; }
         if(!tag.startsWith('#')) { tag = '#' + tag; }
         if(tag.length < 2) { tag = '#12345'; }
 
-        currentUser = { username, tag, color, fullTag: `${username}${tag}` };
+        const loginBtn = document.getElementById('login-btn');
+        loginBtn.innerText = "Checking...";
+        loginBtn.disabled = true;
 
-        document.getElementById('user-profile-summary').innerHTML = `
-            <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
-            <div>${currentUser.username}<span>${currentUser.tag}</span></div>
-        `;
+        try {
+            // 1. Check if user already exists in 'users' table
+            const { data: userExists, error: fetchError } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('username', username)
+                .maybeSingle();
 
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('app-screen').classList.remove('hidden');
-        
-        fetchMessages();
-        listenForNewMessages();
+            if (fetchError) throw fetchError;
+
+            if (userExists) {
+                // User exists -> Verify password
+                if (userExists.password !== pass) {
+                    showError('❌ Wrong password for this username, bro!');
+                    loginBtn.innerText = "Login / Register";
+                    loginBtn.disabled = false;
+                    return;
+                }
+                // Password matches -> log them in with their saved database details
+                currentUser = { 
+                    username: userExists.username, 
+                    tag: userExists.tag, 
+                    color: userExists.color, 
+                    fullTag: `${userExists.username}${userExists.tag}` 
+                };
+            } else {
+                // User doesn't exist -> Register them fresh
+                const { error: insertError } = await supabaseClient
+                    .from('users')
+                    .insert([{ username, password: pass, tag, color }]);
+
+                if (insertError) throw insertError;
+
+                currentUser = { username, tag, color, fullTag: `${username}${tag}` };
+            }
+
+            // 2. Successful Auth -> Transition UI Screen
+            document.getElementById('user-profile-summary').innerHTML = `
+                <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
+                <div>${currentUser.username}<span>${currentUser.tag}</span></div>
+            `;
+
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            
+            fetchMessages();
+            listenForNewMessages();
+
+        } catch (err) {
+            console.error(err);
+            showError('Database error: ' + (err.message || 'Check your connections.'));
+            loginBtn.innerText = "Login / Register";
+            loginBtn.disabled = false;
+        }
     }
 
     function switchTab(tabId) {
