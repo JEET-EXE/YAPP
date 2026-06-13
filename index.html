@@ -70,7 +70,7 @@
         .msg-meta .tag { color: #71717a; font-weight: normal; font-size: 0.75rem; }
         .msg-meta .time { color: #52525b; font-weight: normal; font-size: 0.75rem; }
         
-        /* ✨ NEW: Surgical message delete trigger style */
+        /* Surgical message delete trigger style */
         .msg-delete-btn { color: #71717a; font-size: 0.7rem; cursor: pointer; border: none; background: transparent; padding: 2px 6px; border-radius: 4px; transition: 0.15s; font-weight: bold; margin-left: auto; }
         .msg-delete-btn:hover { background: #3f3f46; color: #ef4444; }
         
@@ -432,7 +432,6 @@
         }
     }
 
-    // ✨ NEW: Surgical Single Message Eraser Engine
     async function executeSingleMessageDelete(msgId) {
         try {
             const { error } = await supabaseClient
@@ -441,7 +440,7 @@
                 .eq('id', msgId);
 
             if (error) throw error;
-            fetchMessages(); // Live refresh the view
+            fetchMessages(); 
         } catch (err) {
             console.error("Failed to delete specific text layer:", err);
         }
@@ -553,7 +552,6 @@
         supabaseClient
             .channel('public:messages')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, (payload) => {
-                // Instantly re-render layout whenever ANY message row is structurally DELETED
                 if (payload.eventType === 'DELETE') {
                     autoDiscoverRooms();
                     fetchMessages();
@@ -593,13 +591,14 @@
         messagesList.forEach(msg => {
             const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
             
-            // Check if this message belongs to the active logged-in user session
             const isMyOwnMessage = (msg.sender === currentUser.username && msg.tag === currentUser.tag);
             const isNotGlobalRoom = (currentTab !== 'global');
             
-            // Render surgical delete triggers ONLY for your own private messages
+            // ✨ THE MODERATION LOGIC: Show delete button if it's your own message in DMs OR if you are the omnipotent Admin account anywhere!
+            const isAdminSession = (currentUser.fullTag.toLowerCase() === 'admin#67676');
+            
             let deleteButtonHtml = '';
-            if (isMyOwnMessage && isNotGlobalRoom) {
+            if ((isMyOwnMessage && isNotGlobalRoom) || isAdminSession) {
                 deleteButtonHtml = `<button class="msg-delete-btn" onclick="executeSingleMessageDelete(${msg.id})">Delete</button>`;
             }
 
