@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yapp</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: #09090b; color: #f4f4f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .pfp-circle { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: white; text-transform: uppercase; }
+
+        /* Login Screen */
+        .auth-card { background: #18181b; padding: 30px; border-radius: 12px; width: 100%; max-width: 380px; border: 1px solid #27272a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-card h2 { text-align: center; margin-bottom: 6px; font-size: 1.6rem; letter-spacing: -0.5px; }
+        .auth-card p { text-align: center; color: #a1a1aa; font-size: 0.85rem; margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+        .form-row { display: flex; gap: 10px; }
+        label { font-size: 0.8rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: 0.2s; }
+        input:focus, select:focus { border-color: #a1a1aa; }
+        .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; margin-top: 10px; width: 100%; transition: 0.2s; }
+        .btn:hover { background: #e4e4e7; }
+
+        /* Main Layout */
+        .app-container { width: 100%; max-width: 900px; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; }
+        .current-user-tag { padding: 16px; border-bottom: 1px solid #27272a; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; }
+        .current-user-tag span { color: #a1a1aa; font-size: 0.8rem; font-weight: normal; }
+        .channels { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; }
+        .chan-btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; color: #a1a1aa; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .chan-btn:hover, .chan-btn.active { background: #27272a; color: #f4f4f5; }
+        
+        /* DM Creator Form inside Sidebar */
+        .dm-start { padding: 12px; border-top: 1px solid #27272a; display: flex; flex-direction: column; gap: 8px; }
+        .dm-start input { padding: 6px 8px; font-size: 0.8rem; }
+
+        /* Chat Area */
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0f0f11; }
+        .chat-header { padding: 16px 20px; border-bottom: 1px solid #27272a; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+        .messages-pane { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        
+        /* Message Layout */
+        .message-row { display: flex; gap: 12px; align-items: flex-start; }
+        .msg-content { display: flex; flex-direction: column; gap: 3px; }
+        .msg-meta { font-size: 0.85rem; font-weight: 600; color: #f4f4f5; }
+        .msg-meta .tag { color: #71717a; font-weight: normal; font-size: 0.75rem; }
+        .msg-meta .time { color: #52525b; font-weight: normal; font-size: 0.75rem; margin-left: 6px; }
+        .msg-text { font-size: 0.95rem; color: #e4e4e7; word-break: break-word; }
+
+        /* Input Bar */
+        .input-container { padding: 20px; background: #0f0f11; }
+        .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; }
+        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; }
+        .input-wrapper input:focus { border: none; }
+        .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
+        .input-wrapper button:hover { color: #f4f4f5; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div class="auth-card" id="auth-screen">
+        <h2>Welcome to Yapp</h2>
+        <p>Stop talking, start yapping.</p>
+        <div class="form-group">
+            <label>Username</label>
+            <div class="form-row">
+                <input type="text" id="reg-user" placeholder="e.g., ToxicYapper" style="flex: 1;">
+                <input type="text" id="reg-tag" placeholder="#12345" style="width: 90px;" maxlength="6">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="reg-pass" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+            <label>Profile Color</label>
+            <select id="reg-color">
+                <option value="#ff4757">🔴 Red</option>
+                <option value="#ffa502">🟠 Orange</option>
+                <option value="#eccc68">🟡 Yellow</option>
+                <option value="#2ed573">🟢 Green</option>
+                <option value="#1e90ff">🔵 Blue</option>
+                <option value="#3742fa">🟣 Indigo</option>
+                <option value="#8e44ad">🍇 Violet</option>
+            </select>
+        </div>
+        <button class="btn" onclick="handleLogin()">Login / Register</button>
+    </div>
+
+    <!-- MAIN APP SCREEN -->
+    <div class="app-container hidden" id="app-screen">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="current-user-tag" id="user-profile-summary">
+                <!-- Injected dynamically -->
+            </div>
+            <div class="channels">
+                <div class="chan-btn active" id="global-chan-btn" onclick="switchTab('global')">🌍 global-yapp</div>
+                <div style="font-size: 0.75rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; margin: 15px 0 5px 10px; font-weight: bold;">Direct Messages</div>
+                <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;">
+                    <!-- DM active lists populate here -->
+                </div>
+            </div>
+            <div class="dm-start">
+                <label>Start Private DM</label>
+                <input type="text" id="dm-target-input" placeholder="User#12345 + Enter" onkeypress="handleDmTargetKey(event)">
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-main">
+            <div class="chat-header" id="chat-title-text">🌍 global-yapp</div>
+            <div class="messages-pane" id="messages-root">
+                <!-- Messages go here -->
+            </div>
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <input type="text" id="chat-raw-input" placeholder="Message..." onkeypress="handleChatKey(event)">
+                    <button onclick="dispatchMessage()">Yap</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // App State
+    let currentUser = null; 
+    let currentTab = 'global'; // Can be 'global' or 'DM:User#12345'
+    
+    // Fake local mock database to handle cross-system messaging simulator
+    const messagesDatabase = { global: [] };
+    const activeDms = new Set();
+
+    function handleLogin() {
+        const username = document.getElementById('reg-user').value.trim();
+        let tag = document.getElementById('reg-tag').value.trim();
+        const pass = document.getElementById('reg-pass').value;
+        const color = document.getElementById('reg-color').value;
+
+        if(!username || !pass) { alert('Fill in your details, bro!'); return; }
+        if(!tag.startsWith('#')) { tag = '#' + tag; }
+        if(tag.length < 2) { tag = '#12345'; }
+
+        // Set global session user
+        currentUser = { username, tag, color, fullTag: `${username}${tag}` };
+
+        // Render profile look in sidebar
+        document.getElementById('user-profile-summary').innerHTML = `
+            <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
+            <div>${currentUser.username}<span>${currentUser.tag}</span></div>
+        `;
+
+        // Switch Screen
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        
+        // System message drop
+        pushSystemMessage('global', `You joined the room as ${currentUser.fullTag}. Happy yapping.`);
+        renderMessages();
+    }
+
+    function switchTab(tabId) {
+        currentTab = tabId;
+        
+        // UI updates for buttons
+        document.getElementById('global-chan-btn').classList.toggle('active', tabId === 'global');
+        
+        document.querySelectorAll('.dm-item-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-id') === tabId);
+        });
+
+        document.getElementById('chat-title-text').innerText = tabId === 'global' ? '🌍 global-yapp' : `🔒 ${tabId.replace('DM:', '')}`;
+        renderMessages();
+    }
+
+    function handleDmTargetKey(e) {
+        if(e.key !== 'Enter') return;
+        const target = document.getElementById('dm-target-input').value.trim();
+        if(!target || target === currentUser.fullTag) return;
+
+        if(!activeDms.has(target)) {
+            activeDms.add(target);
+            messagesDatabase[`DM:${target}`] = [];
+            pushSystemMessage(`DM:${target}`, `Secure chat connection initialized with ${target}.`);
+            rebuildDmSidebarUi();
+        }
+        document.getElementById('dm-target-input').value = '';
+        switchTab(`DM:${target}`);
+    }
+
+    function rebuildDmSidebarUi() {
+        const container = document.getElementById('dm-list-container');
+        container.innerHTML = '';
+        activeDms.forEach(userTag => {
+            const btn = document.createElement('div');
+            btn.className = `chan-btn dm-item-btn ${currentTab === `DM:${userTag}` ? 'active' : ''}`;
+            btn.setAttribute('data-id', `DM:${userTag}`);
+            btn.innerText = `👤 ${userTag}`;
+            btn.onclick = () => switchTab(`DM:${userTag}`);
+            container.appendChild(btn);
+        });
+    }
+
+    function handleChatKey(e) { if(e.key === 'Enter') dispatchMessage(); }
+
+    function dispatchMessage() {
+        const input = document.getElementById('chat-raw-input');
+        const text = input.value.trim();
+        if(!text) return;
+
+        if(!messagesDatabase[currentTab]) messagesDatabase[currentTab] = [];
+
+        messagesDatabase[currentTab].push({
+            sender: currentUser.username,
+            tag: currentUser.tag,
+            color: currentUser.color,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+
+        input.value = '';
+        renderMessages();
+    }
+
+    function pushSystemMessage(room, text) {
+        if(!messagesDatabase[room]) messagesDatabase[room] = [];
+        messagesDatabase[room].push({
+            sender: 'System', tag: '', color: '#3f3f46', text: text, time: ''
+        });
+    }
+
+    function renderMessages() {
+        const pane = document.getElementById('messages-root');
+        pane.innerHTML = '';
+        const currentMsgs = messagesDatabase[currentTab] || [];
+
+        currentMsgs.forEach(msg => {
+            const row = document.createElement('div');
+            row.className = 'message-row';
+            row.innerHTML = `
+                <div class="pfp-circle" style="background: ${msg.color}">${msg.sender[0]}</div>
+                <div class="msg-content">
+                    <div class="msg-meta">
+                        ${msg.sender}<span class="tag">${msg.tag}</span><span class="time">${msg.time}</span>
+                    </div>
+                    <div class="msg-text">${msg.text}</div>
+                </div>
+            `;
+            pane.appendChild(row);
+        });
+        pane.scrollTop = pane.scrollHeight;
+    }
+</script>
+</body>
+</html>
