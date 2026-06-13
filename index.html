@@ -27,8 +27,8 @@
         /* Error Alert Message Styling */
         .error-banner { background: #ef4444; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; display: none; font-weight: 500; }
 
-        /* Main Layout - Fixed max-width to let it scale completely */
-        .app-container { width: 100%; max-width: 100%; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        /* Main Layout */
+        .app-container { width: 100%; max-width: 900px; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         
         /* Sidebar */
         .sidebar { width: 260px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; }
@@ -63,13 +63,13 @@
         .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
         .input-wrapper button:hover { color: #f4f4f5; }
 
-        /* Mobile Responsive UI Overrides - Completely tuned to stack fluidly */
+        /* Mobile Responsive UI Overrides */
         @media (max-width: 768px) {
-            body { padding: 0; height: 100vh; overflow: hidden; }
-            .app-container { width: 100vw; max-width: 100%; height: 100vh; border-radius: 0; border: none; flex-direction: column; }
-            .sidebar { width: 100%; height: auto; max-height: 110px; border-right: none; border-bottom: 1px solid #27272a; }
-            .dm-start { display: none !important; } 
-            .chat-main { flex: 1; height: calc(100% - 110px); }
+            body { padding: 10px; height: 100vh; overflow: hidden; }
+            .app-container { height: 100%; flex-direction: column; }
+            .sidebar { width: 100%; height: auto; max-height: 140px; border-right: none; border-bottom: 1px solid #27272a; }
+            .dm-start { display: none; } 
+            .chat-main { flex: 1; height: calc(100% - 140px); }
             .messages-pane { padding: 12px; gap: 12px; }
             .input-container { padding: 12px; }
         }
