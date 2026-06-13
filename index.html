@@ -58,18 +58,21 @@
         /* Input Bar */
         .input-container { padding: 20px; background: #0f0f11; }
         .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; }
-        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; }
+        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; }
         .input-wrapper input:focus { border: none; }
         .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
         .input-wrapper button:hover { color: #f4f4f5; }
 
-        /* Mobile Responsive UI Overrides */
+        /* Mobile Responsive UI Overrides - COMPLETELY REWRITTEN TO NEVER BREAK ELEMENT HEIGHTS */
         @media (max-width: 768px) {
-            body { padding: 10px; height: 100vh; overflow: hidden; }
-            .app-container { height: 100%; flex-direction: column; }
-            .sidebar { width: 100%; height: auto; max-height: 140px; border-right: none; border-bottom: 1px solid #27272a; }
-            .dm-start { display: none; } 
-            .chat-main { flex: 1; height: calc(100% - 140px); }
+            body { padding: 0; overflow: hidden; }
+            .app-container { width: 100vw; max-width: 100vw; height: 100vh; border-radius: 0; border: none; display: grid; grid-template-rows: auto 1fr; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #27272a; display: flex; flex-direction: column; }
+            .current-user-tag { padding: 10px 16px; }
+            .channels { padding: 8px; gap: 4px; }
+            .dm-start { display: none !important; } 
+            .chat-main { height: 100%; min-height: 0; overflow: hidden; }
+            .chat-header { padding: 12px 16px; }
             .messages-pane { padding: 12px; gap: 12px; }
             .input-container { padding: 12px; }
         }
@@ -111,13 +114,11 @@
 
     <div class="app-container hidden" id="app-screen">
         <div class="sidebar">
-            <div class="current-user-tag" id="user-profile-summary">
-                </div>
+            <div class="current-user-tag" id="user-profile-summary"></div>
             <div class="channels">
                 <div class="chan-btn active" id="global-chan-btn" onclick="switchTab('global')">🌍 global-yapp</div>
                 <div style="font-size: 0.75rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; margin: 15px 0 5px 10px; font-weight: bold;">Direct Messages</div>
-                <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;">
-                    </div>
+                <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;"></div>
             </div>
             <div class="dm-start">
                 <label>Start Private DM</label>
@@ -127,8 +128,7 @@
 
         <div class="chat-main">
             <div class="chat-header" id="chat-title-text">🌍 global-yapp</div>
-            <div class="messages-pane" id="messages-root">
-                </div>
+            <div class="messages-pane" id="messages-root"></div>
             <div class="input-container">
                 <div class="input-wrapper">
                     <input type="text" id="chat-raw-input" placeholder="Message..." onkeypress="handleChatKey(event)">
@@ -173,7 +173,6 @@
         loginBtn.disabled = true;
 
         try {
-            // 1. Check if user already exists
             const { data: userExists, error: fetchError } = await supabaseClient
                 .from('users')
                 .select('*')
@@ -183,7 +182,6 @@
             if (fetchError) throw fetchError;
 
             if (userExists) {
-                // Verify password
                 if (userExists.password !== pass) {
                     showError('❌ Wrong password for this username, bro!');
                     loginBtn.innerText = "Login / Register";
@@ -197,7 +195,6 @@
                     fullTag: `${userExists.username}${userExists.tag}` 
                 };
             } else {
-                // Register fresh account
                 const { error: insertError } = await supabaseClient
                     .from('users')
                     .insert([{ username, password: pass, tag, color }]);
@@ -207,7 +204,6 @@
                 currentUser = { username, tag, color, fullTag: `${username}${tag}` };
             }
 
-            // 2. Successful Auth -> Transition UI Screen
             document.getElementById('user-profile-summary').innerHTML = `
                 <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
                 <div>${currentUser.username}<span>${currentUser.tag}</span></div>
