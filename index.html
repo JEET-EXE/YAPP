@@ -40,7 +40,7 @@
         
         /* DM Creator Form inside Sidebar */
         .dm-start { padding: 12px; border-top: 1px solid #27272a; display: flex; flex-direction: column; gap: 8px; background: #18181b; }
-        .dm-start input { padding: 6px 8px; font-size: 0.8rem; width: 100%; }
+        .dm-start input { padding: 6px 8px; font-size: 0.8rem; }
 
         /* Chat Area */
         .chat-main { flex: 1; display: flex; flex-direction: column; background: #0f0f11; min-height: 0; }
@@ -122,7 +122,10 @@
             </div>
             <div class="dm-start">
                 <label>Start Private DM</label>
-                <input type="text" id="dm-target-input" placeholder="User#12345 + Enter" onkeypress="handleDmTargetKey(event)">
+                <div style="display: flex; gap: 4px; width: 100%;">
+                    <input type="text" id="dm-target-input" placeholder="User#12345 + Enter" onkeypress="handleDmTargetKey(event)" style="flex: 1;">
+                    <button onclick="triggerMobileDmSubmit()" style="background: #27272a; color: white; border: 1px solid #3f3f46; border-radius: 6px; padding: 0 10px; cursor: pointer; font-size: 0.8rem;">Go</button>
+                </div>
             </div>
         </div>
 
@@ -210,7 +213,7 @@
                 <div>${currentUser.username}<span>${currentUser.tag}</span></div>
             `;
 
-            // Load persistent chatroom tabs specific to this full user tag
+            // Load saved DM rooms for this specific account out of localStorage
             const savedDms = localStorage.getItem(`yapp_dms_${currentUser.fullTag}`);
             if(savedDms) {
                 activeDms = JSON.parse(savedDms);
@@ -236,7 +239,13 @@
     }
 
     function handleDmTargetKey(e) {
-        if(e.key !== 'Enter') return;
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            triggerMobileDmSubmit();
+        }
+    }
+
+    function triggerMobileDmSubmit() {
         const targetInput = document.getElementById('dm-target-input');
         const targetUser = targetInput.value.trim();
         
@@ -311,11 +320,10 @@
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
                 const newMsg = payload.new;
                 
-                // Real-time automatic tab initialization if someone sends you an incoming private message!
+                // Dynamically spin up the private window tab if another yapper starts a conversation with us!
                 if (newMsg.room && newMsg.room !== 'global') {
                     const structuralParts = newMsg.room.split('_');
                     if (structuralParts.includes(currentUser.fullTag)) {
-                        // Find who texted us
                         const senderFullTag = `${newMsg.sender}${newMsg.tag}`;
                         if (senderFullTag !== currentUser.fullTag && !activeDms.includes(senderFullTag)) {
                             activeDms.push(senderFullTag);
