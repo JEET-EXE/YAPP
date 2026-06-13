@@ -241,7 +241,6 @@
         loginBtn.disabled = true;
 
         try {
-            // 🛠️ FIX: Query using BOTH username AND tag to prevent login impersonation hijacks
             const { data: userExists, error: fetchError } = await supabaseClient
                 .from('users')
                 .select('*')
@@ -265,8 +264,20 @@
                     fullTag: `${userExists.username}${userExists.tag}` 
                 };
             } else {
-                // Double check that the username isn't taken with a DIFFERENT tag if we want tight checks, 
-                // but standard discord style allows same names with unique tags. Let's register it uniquely!
+                // First, check if the username is completely taken regardless of tag to prevent confusion
+                const { data: nameCheck } = await supabaseClient
+                    .from('users')
+                    .select('username')
+                    .eq('username', username)
+                    .maybeSingle();
+
+                if (nameCheck) {
+                    showError('❌ That username is already taken! Try another one, bro.');
+                    loginBtn.innerText = "Login / Register";
+                    loginBtn.disabled = false;
+                    return;
+                }
+
                 const { error: insertError } = await supabaseClient
                     .from('users')
                     .insert([{ username, password: pass, tag, color }]);
@@ -292,7 +303,14 @@
 
         } catch (err) {
             console.error(err);
-            showError('Database error: ' + (err.message || 'Check your connections.'));
+            
+            // 🛠️ FIX: Catch SQL unique constraints and turn them into nice messages
+            if (err.message && err.message.includes('unique constraint')) {
+                showError('❌ That username is already registered. Try a different one!');
+            } else {
+                showError('Database error: ' + (err.message || 'Check your connections.'));
+            }
+            
             loginBtn.innerText = "Login / Register";
             loginBtn.disabled = false;
         }
