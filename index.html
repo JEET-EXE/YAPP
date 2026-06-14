@@ -61,7 +61,6 @@
         input, select { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: all 0.2s ease; }
         input:focus, select:focus { border-color: #a1a1aa; background: #2e2e33; }
         
-        /* Two-Button Framework layout system */
         .auth-btn-row { display: flex; gap: 10px; margin-top: 10px; }
         .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; width: 100%; transition: all 0.2s ease; }
         .btn:hover { background: #e4e4e7; transform: translateY(-1px); }
@@ -81,7 +80,6 @@
         .current-user-tag span { color: #a1a1aa; font-size: 0.8rem; font-weight: normal; }
         .channels { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
         
-        /* Channel Buttons */
         .chan-btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; color: #a1a1aa; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: all 0.2s ease; }
         .chan-btn:hover, .chan-btn.active { background: #27272a; color: #f4f4f5; }
         .chan-btn:active { transform: scale(0.98); }
@@ -102,7 +100,7 @@
         .chat-header { padding: 14px 20px; border-bottom: 1px solid #27272a; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .messages-pane { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         
-        /* Message Rows */
+        /* Message Layout */
         .message-row { display: flex; gap: 12px; align-items: flex-start; animation: msgSlide 0.25s cubic-bezier(0.215, 0.610, 0.355, 1); }
         .msg-content { display: flex; flex-direction: column; gap: 3px; position: relative; width: 100%; }
         .msg-meta { font-size: 0.85rem; font-weight: 600; color: #f4f4f5; display: flex; align-items: center; gap: 6px; }
@@ -130,7 +128,7 @@
         .mobile-inline-form-row input { flex: 1; }
         .mobile-inline-form-row button { background: #f4f4f5; color: #09090b; border: none; border-radius: 6px; padding: 0 16px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
 
-        /* Admin Dashboard Overlay */
+        /* Admin Dashboard */
         .admin-dashboard-view { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0c0c0e; z-index: 1000; flex-direction: column; padding: 25px; overflow-y: auto; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; margin-bottom: 24px; }
         .metric-card { background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; text-align: center; }
@@ -142,8 +140,12 @@
         .directory-table th, .directory-table td { padding: 12px; border-bottom: 1px solid #222226; }
         .directory-table th { color: #a1a1aa; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
         .directory-table td { color: #e4e4e7; }
+        
+        /* 🛠️ Styled ban button element */
+        .ban-hammer-action { background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; transition: 0.2s; }
+        .ban-hammer-action:hover { background: #b91c1c; transform: scale(1.05); }
 
-        /* Mobile Nav */
+        /* Mobile Nav Bar */
         .mobile-nav-bar { display: none; background: #18181b; border-top: 1px solid #27272a; height: 65px; min-height: 65px; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { color: #a1a1aa; font-size: 0.9rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 50%; height: 100%; justify-content: center; transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; }
         .nav-item.active { color: #f4f4f5; background: #27272a; }
@@ -247,6 +249,7 @@
                                     <th>Tag</th>
                                     <th>Password</th>
                                     <th>Color Hex</th>
+                                    <th>Ban Protocol</th>
                                 </tr>
                             </thead>
                             <tbody id="admin-directory-rows-root"></tbody>
@@ -344,6 +347,17 @@
     }
 
     async function initializeMainApplicationView() {
+        // ✨ LIVE TERMINATION LOOP CHECK: Instantly boot out any active cached sessions if they are on the ban sheet
+        try {
+            const { data: isBanned } = await supabaseClient.from('bans').select('*').eq('target_fulltag', currentUser.fullTag.toLowerCase()).maybeSingle();
+            if(isBanned) {
+                localStorage.removeItem('yapp_cached_user');
+                alert("🚨 SECURITY AGENT: This device signature has been permanently blacklisted by Admin.");
+                window.location.reload();
+                return;
+            }
+        } catch(e){}
+
         document.getElementById('user-profile-summary').innerHTML = `
             <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
             <div>${currentUser.username}<span>${currentUser.tag}</span></div>
@@ -366,7 +380,6 @@
         window.location.reload(); 
     }
 
-    // ✨ UPDATED DETONATION AUTH CORE ROUTER
     async function executeAuthenticationFlow(mode) {
         clearStatusBanners();
         const username = document.getElementById('reg-user').value.trim();
@@ -378,12 +391,21 @@
         if(!tag.startsWith('#')) { tag = '#' + tag; }
         if(tag.length < 2) { tag = '#12345'; }
 
+        const combinedTag = `${username}${tag}`.toLowerCase();
+
         const mainBtn = document.getElementById('login-action-btn');
         const secondaryBtn = document.getElementById('register-action-btn');
         mainBtn.disabled = true; secondaryBtn.disabled = true;
 
         try {
-            // Fetch account status checking BOTH user and tag simultaneously
+            // ✨ SECURED: Intercept entry if user token sits in the un-deletable blackhole bans list
+            const { data: banCheck } = await supabaseClient.from('bans').select('*').eq('target_fulltag', combinedTag).maybeSingle();
+            if(banCheck) {
+                showError('🚨 Nice try, bro! This account sequence has been permanently banned from the server.');
+                mainBtn.disabled = false; secondaryBtn.disabled = false;
+                return;
+            }
+
             const { data: userRow, error: fetchError } = await supabaseClient
                 .from('users')
                 .select('*')
@@ -415,7 +437,6 @@
                     mainBtn.disabled = false; secondaryBtn.disabled = false;
                     return;
                 }
-                // Strict anti-hijacking shield block
                 if (username.toLowerCase() === 'admin') {
                     showError('🚨 Nice try, bro! You cannot register a brand new Admin token name.');
                     mainBtn.disabled = false; secondaryBtn.disabled = false;
@@ -458,6 +479,11 @@
         if(!show) { panel.style.display = 'none'; return; }
         
         panel.style.display = 'flex';
+        await refreshLiveDatabaseDirectory();
+    }
+
+    // ✨ NEW: Segregated directory re-rendering core so updates cascade smoothly
+    async function refreshLiveDatabaseDirectory() {
         try {
             const { data: allUsers, error: usersErr } = await supabaseClient.from('users').select('*').order('username', { ascending: true });
             const { count: msgCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true });
@@ -476,15 +502,45 @@
 
             (allUsers || []).forEach(account => {
                 const tr = document.createElement('tr');
+                const fullStringTag = `${account.username}${account.tag}`;
+                
+                // Hide ban hammer execution link on the super admin identity row
+                let operationActionNode = `<button class="ban-hammer-action" onclick="dropTheBanHammer('${account.username}', '${account.tag}')">💥 Ban</button>`;
+                if (fullStringTag.toLowerCase() === 'admin#67676') { operationActionNode = `<span style="color:#71717a; font-size:0.75rem;">Immune</span>`; }
+
                 tr.innerHTML = `
                     <td style="font-weight:600; color:#fff;">${account.username || 'N/A'}</td>
                     <td style="color:#a1a1aa;">${account.tag || 'N/A'}</td>
                     <td style="font-family:monospace; color:#eccc68;">${account.password || '••••'}</td>
                     <td><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${account.color || '#fff'}; margin-right:6px;"></span>${account.color || '#fff'}</td>
+                    <td>${operationActionNode}</td>
                 `;
                 rowsContainer.appendChild(tr);
             });
         } catch(e) { console.error(e); }
+    }
+
+    // ✨ NEW: THE PERMABAN AND RECYCLE DATA DATA WIPE PROTOCOL
+    async function dropTheBanHammer(targetUser, targetTag) {
+        const fullCombo = `${targetUser}${targetTag}`;
+        if(!confirm(`⚠️ WARNING: Are you sure you want to completely destroy ${fullCombo}? \nThis will wipe all their messages, flush their profile data, and block their login token forever, allowing the name to be recycled!`)) return;
+
+        try {
+            // 1. Log block marker inside un-deletable 'bans' table
+            await supabaseClient.from('bans').insert([{ target_fulltag: fullCombo.toLowerCase() }]);
+
+            // 2. Wipe account completely from 'users' table (Name + Tag recycled instantly!)
+            await supabaseClient.from('users').delete().eq('username', targetUser).eq('tag', targetTag);
+
+            // 3. Purge all their messages out of global/private logs
+            await supabaseClient.from('messages').delete().eq('sender', targetUser).eq('tag', targetTag);
+
+            // 4. Force background thread directory layout refresh
+            await refreshLiveDatabaseDirectory();
+            alert(`🔨 Ban Hammer deployed! ${fullCombo} has been vaporized and recycled.`);
+        } catch(err) {
+            alert('Ban execution error: ' + err.message);
+        }
     }
 
     async function nukeGlobalChatLog() {
@@ -497,6 +553,7 @@
     }
 
     async function autoDiscoverRooms() {
+        if (!currentUser) return;
         try {
             const { data, error } = await supabaseClient.from('messages').select('room').not('room', 'is', null).not('room', 'eq', 'global');
             if (error) throw error;
