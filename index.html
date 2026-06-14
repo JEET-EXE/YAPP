@@ -17,38 +17,55 @@
         .hidden { display: none !important; }
         .pfp-circle { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: white; text-transform: uppercase; }
 
+        /* ✨ ANIMATION KEYFRAMES */
+        @keyframes popUp {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes msgSlide {
+            0% { transform: translateY(8px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideUpModal {
+            0% { transform: translateY(100%); }
+            100% { transform: translateY(0); }
+        }
+
         /* Login Screen */
-        .auth-card { background: #18181b; padding: 30px; border-radius: 12px; width: 100%; max-width: 380px; border: 1px solid #27272a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-card { background: #18181b; padding: 30px; border-radius: 12px; width: 100%; max-width: 380px; border: 1px solid #27272a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: popUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .auth-card h2 { text-align: center; margin-bottom: 6px; font-size: 1.6rem; letter-spacing: -0.5px; }
         .auth-card p { text-align: center; color: #a1a1aa; font-size: 0.85rem; margin-bottom: 4px; }
         .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
         .form-row { display: flex; gap: 10px; }
         label { font-size: 0.8rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: 0.2s; }
-        input:focus, select:focus { border-color: #a1a1aa; }
-        .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; margin-top: 10px; width: 100%; transition: 0.2s; }
-        .btn:hover { background: #e4e4e7; }
+        input, select { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: all 0.2s ease; }
+        input:focus, select:focus { border-color: #a1a1aa; background: #2e2e33; }
+        .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; margin-top: 10px; width: 100%; transition: all 0.2s ease; }
+        .btn:hover { background: #e4e4e7; transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
         
         /* Error Alert Message Styling */
-        .error-banner { background: #ef4444; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; display: none; font-weight: 500; }
+        .error-banner { background: #ef4444; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; display: none; font-weight: 500; animation: popUp 0.2s ease-out; }
 
         /* Main Layout */
-        .app-container { width: 100%; max-width: 900px; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .app-container { width: 100%; max-width: 900px; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); animation: popUp 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
         
         /* Sidebar (Desktop) */
         .sidebar { width: 260px; background: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; }
-        .current-user-tag { padding: 16px; border-bottom: 1px solid #27272a; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; }
+        .current-user-tag { padding: 16px; border-bottom: 1px solid #27272a; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; transition: background 0.2s; }
+        .current-user-tag:hover { background: #202024; }
         .current-user-tag span { color: #a1a1aa; font-size: 0.8rem; font-weight: normal; }
         .channels { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
         
         /* Standard Channel Row Framework */
-        .chan-btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; color: #a1a1aa; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: 0.2s; }
+        .chan-btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; color: #a1a1aa; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: all 0.2s ease; }
         .chan-btn:hover, .chan-btn.active { background: #27272a; color: #f4f4f5; }
+        .chan-btn:active { transform: scale(0.98); }
         .chan-left { display: flex; align-items: center; gap: 8px; min-width: 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
         
         /* Delete Button Hover Action */
-        .nuke-room-trigger { color: #71717a; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; transition: 0.15s; font-weight: bold; }
-        .nuke-room-trigger:hover { background: #ef4444; color: white; }
+        .nuke-room-trigger { color: #71717a; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; transition: all 0.15s ease; font-weight: bold; }
+        .nuke-room-trigger:hover { background: #ef4444; color: white; transform: scale(1.1); }
 
         /* DM Creator Form inside Sidebar */
         .dm-start { padding: 12px; border-top: 1px solid #27272a; display: flex; flex-direction: column; gap: 8px; background: #18181b; }
@@ -60,35 +77,37 @@
         /* Chat Area */
         .chat-main { flex: 1; display: flex; flex-direction: column; background: #0f0f11; min-height: 0; position: relative; }
         .chat-header { padding: 14px 20px; border-bottom: 1px solid #27272a; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .messages-pane { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .messages-pane { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         
         /* Message Layout */
-        .message-row { display: flex; gap: 12px; align-items: flex-start; }
+        .message-row { display: flex; gap: 12px; align-items: flex-start; animation: msgSlide 0.25s cubic-bezier(0.215, 0.610, 0.355, 1); }
         .msg-content { display: flex; flex-direction: column; gap: 3px; position: relative; width: 100%; }
         .msg-meta { font-size: 0.85rem; font-weight: 600; color: #f4f4f5; display: flex; align-items: center; gap: 6px; }
         .msg-meta .tag { color: #71717a; font-weight: normal; font-size: 0.75rem; }
         .msg-meta .time { color: #52525b; font-weight: normal; font-size: 0.75rem; }
         
         /* Surgical message delete trigger style */
-        .msg-delete-btn { color: #71717a; font-size: 0.7rem; cursor: pointer; border: none; background: transparent; padding: 2px 6px; border-radius: 4px; transition: 0.15s; font-weight: bold; margin-left: auto; }
+        .msg-delete-btn { color: #71717a; font-size: 0.7rem; cursor: pointer; border: none; background: transparent; padding: 2px 6px; border-radius: 4px; transition: all 0.15s ease; font-weight: bold; margin-left: auto; }
         .msg-delete-btn:hover { background: #3f3f46; color: #ef4444; }
         
         .msg-text { font-size: 0.95rem; color: #e4e4e7; word-break: break-word; }
 
         /* Input Bar */
         .input-container { padding: 16px; background: #0f0f11; }
-        .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; }
+        .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; transition: border-color 0.2s; }
+        .input-wrapper:focus-within { border-color: #52525b; }
         .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; }
-        .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
+        .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; transition: color 0.2s; }
         .input-wrapper button:hover { color: #f4f4f5; }
 
         /* 📱 MOBILE NAVIGATION BAR */
         .mobile-nav-bar { display: none; background: #18181b; border-top: 1px solid #27272a; height: 65px; min-height: 65px; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { color: #a1a1aa; font-size: 0.9rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 50%; height: 100%; justify-content: center; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+        .nav-item { color: #a1a1aa; font-size: 0.9rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 50%; height: 100%; justify-content: center; transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; }
         .nav-item.active { color: #f4f4f5; background: #27272a; }
 
         /* 📱 MOBILE MODAL OVERLAY FOR CHATS */
         .mobile-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 999; flex-direction: column; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+        .mobile-modal.slide-active { display: flex; animation: slideUpModal 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 10px; }
         .close-modal-btn { background: #27272a; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
 
@@ -141,7 +160,7 @@
     <div class="app-container hidden" id="app-screen">
         
         <div class="sidebar">
-            <div class="current-user-tag" id="user-profile-summary"></div>
+            <div class="current-user-tag" id="user-profile-summary" style="cursor: pointer;" title="Click to Logout" onclick="handleSystemLogout()"></div>
             <div class="channels">
                 <div class="chan-btn active" id="global-chan-btn" onclick="switchTab('global', '🌍 global-yapp')">
                     <div class="chan-left">🌍 global-yapp</div>
@@ -165,7 +184,7 @@
             
             <div class="mobile-modal" id="chats-overlay-modal">
                 <div class="modal-header">
-                    <h3 style="font-size: 1.1rem; font-weight: bold;">Direct Messages</h3>
+                    <h3 id="mobile-modal-title-logout" style="font-size: 1.1rem; font-weight: bold; cursor: pointer; color: #71717a;" onclick="handleSystemLogout()">Logout 🚪</h3>
                     <button class="close-modal-btn" onclick="toggleMobileModal(false)">Close</button>
                 </div>
                 <div id="mobile-dm-list-container" style="display:flex; flex-direction:column; gap:10px; flex: 1; overflow-y: auto; margin-bottom: 20px;"></div>
@@ -215,6 +234,10 @@
     let currentTab = 'global'; 
     let activeDms = []; 
 
+    window.addEventListener('DOMContentLoaded', () => {
+        checkSavedUserSession();
+    });
+
     function showError(text) {
         const errBox = document.getElementById('error-message');
         errBox.innerText = text;
@@ -223,6 +246,45 @@
 
     function clearError() {
         document.getElementById('error-message').style.display = 'none';
+    }
+
+    function checkSavedUserSession() {
+        const savedSession = localStorage.getItem('yapp_cached_user');
+        if (savedSession) {
+            try {
+                currentUser = JSON.parse(savedSession);
+                initializeMainApplicationView();
+            } catch (e) {
+                console.error("Failed to recover user cache session layers:", e);
+                localStorage.removeItem('yapp_cached_user');
+            }
+        }
+    }
+
+    async function initializeMainApplicationView() {
+        document.getElementById('user-profile-summary').innerHTML = `
+            <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
+            <div>${currentUser.username}<span>${currentUser.tag}</span></div>
+        `;
+        
+        const mobTitle = document.getElementById('mobile-modal-title-logout');
+        if (mobTitle) mobTitle.innerText = `${currentUser.username}${currentUser.tag} (Logout 🚪)`;
+
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        
+        evaluateAdminPermissions();
+        await autoDiscoverRooms();
+        fetchMessages();
+        listenForNewMessages();
+    }
+
+    function handleSystemLogout() {
+        const logoutConfirm = confirm("Do you want to log out of your Yapp session, bro?");
+        if (!logoutConfirm) return;
+        
+        localStorage.removeItem('yapp_cached_user');
+        window.location.reload(); 
     }
 
     async function handleLogin() {
@@ -264,7 +326,6 @@
                     fullTag: `${userExists.username}${userExists.tag}` 
                 };
             } else {
-                // First, check if the username is completely taken regardless of tag to prevent confusion
                 const { data: nameCheck } = await supabaseClient
                     .from('users')
                     .select('username')
@@ -287,30 +348,16 @@
                 currentUser = { username, tag, color, fullTag: `${username}${tag}` };
             }
 
-            document.getElementById('user-profile-summary').innerHTML = `
-                <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
-                <div>${currentUser.username}<span>${currentUser.tag}</span></div>
-            `;
-
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
-            
-            evaluateAdminPermissions();
-            
-            await autoDiscoverRooms();
-            fetchMessages();
-            listenForNewMessages();
+            localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
+            initializeMainApplicationView();
 
         } catch (err) {
             console.error(err);
-            
-            // 🛠️ FIX: Catch SQL unique constraints and turn them into nice messages
             if (err.message && err.message.includes('unique constraint')) {
                 showError('❌ That username is already registered. Try a different one!');
             } else {
                 showError('Database error: ' + (err.message || 'Check your connections.'));
             }
-            
             loginBtn.innerText = "Login / Register";
             loginBtn.disabled = false;
         }
@@ -318,7 +365,7 @@
 
     function evaluateAdminPermissions() {
         const nukeSlot = document.getElementById('admin-nuke-slot');
-        if(currentUser.fullTag.toLowerCase() === 'admin#67676') {
+        if(currentUser && currentUser.fullTag.toLowerCase() === 'admin#67676') {
             nukeSlot.innerHTML = `
                 <button onclick="nukeGlobalChatLog()" style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s;">
                     💥 Nuke
@@ -468,6 +515,8 @@
         desktopContainer.innerHTML = '';
         mobileContainer.innerHTML = '';
         
+        if (!currentUser) return; 
+        
         activeDms.forEach(user => {
             const roomId = getRoomId(currentUser.fullTag, user);
             
@@ -504,7 +553,7 @@
         document.getElementById('chat-title-text').innerText = titleText;
         
         const nukeSlot = document.getElementById('admin-nuke-slot');
-        if (currentTab === 'global' && currentUser.fullTag.toLowerCase() === 'admin#67676') {
+        if (currentUser && currentTab === 'global' && currentUser.fullTag.toLowerCase() === 'admin#67676') {
             nukeSlot.style.display = 'block';
         } else {
             nukeSlot.style.display = 'none';
@@ -526,7 +575,11 @@
 
     function toggleMobileModal(show) {
         const modal = document.getElementById('chats-overlay-modal');
-        modal.style.display = show ? 'flex' : 'none';
+        if (show) {
+            modal.classList.add('slide-active');
+        } else {
+            modal.classList.remove('slide-active');
+        }
     }
 
     function updateMobileNavHighlights(activeType) {
@@ -577,7 +630,7 @@
                     const newMsg = payload.new;
                     if (newMsg.room && newMsg.room !== 'global') {
                         const structuralParts = newMsg.room.toLowerCase().split('_');
-                        if (structuralParts.includes(currentUser.fullTag.toLowerCase())) {
+                        if (currentUser && structuralParts.includes(currentUser.fullTag.toLowerCase())) {
                             const senderFullTag = `${newMsg.sender}${newMsg.tag}`.toLowerCase();
                             const exists = activeDms.some(val => val.toLowerCase() === senderFullTag);
                             if (senderFullTag !== currentUser.fullTag.toLowerCase() && !exists) {
@@ -602,6 +655,8 @@
     function renderMessages(messagesList) {
         const pane = document.getElementById('messages-root');
         pane.innerHTML = '';
+        
+        if (!currentUser) return; 
 
         messagesList.forEach(msg => {
             const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
