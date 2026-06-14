@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yapp by Caviar Studios</title>
     
+    <!-- 💎 MAGIC AUTO-GENERATED CAVIAR STUDIOS GOLD DIAMOND ICON -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
 
     <style>
@@ -29,14 +30,8 @@
         .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
         .form-row { display: flex; gap: 10px; }
         label { font-size: 0.8rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; }
-        input { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: all 0.2s ease; }
-        input:focus { border-color: #a1a1aa; background: #2e2e33; }
-        
-        .color-palette-grid { display: flex; gap: 10px; justify-content: center; padding: 8px 0; margin-bottom: 4px; }
-        .palette-node { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
-        .palette-node:hover { transform: scale(1.1); }
-        .palette-node.selected { border-color: #ffffff; transform: scale(1.15); box-shadow: 0 0 12px rgba(255, 255, 255, 0.3); }
-
+        input, select { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: all 0.2s ease; }
+        input:focus, select:focus { border-color: #a1a1aa; background: #2e2e33; }
         .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; margin-top: 10px; width: 100%; transition: all 0.2s ease; }
         .btn:hover { background: #e4e4e7; transform: translateY(-1px); }
         
@@ -86,9 +81,9 @@
 
         /* Input Bar */
         .input-container { padding: 16px; background: #0f0f11; }
-        .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; align-items: center; width: 100%; }
-        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; width: 100%; }
-        .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; height: 100%; }
+        .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; }
+        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; }
+        .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
         .input-wrapper button:hover { color: #f4f4f5; }
 
         /* 📱 MOBILE MODAL OVERLAY FOR NAVIGATION DECK */
@@ -107,6 +102,7 @@
         .metric-card { background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; text-align: center; }
         .metric-value { font-size: 2.2rem; font-weight: 800; color: #eccc68; margin-top: 8px; }
 
+        /* ✨ NEW: User directory layout styles */
         .directory-wrap { flex: 1; background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; min-height: 250px; }
         .directory-table-container { flex: 1; overflow-y: auto; margin-top: 12px; }
         .directory-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
@@ -129,6 +125,7 @@
 </head>
 <body>
 
+    <!-- LOGIN SCREEN -->
     <div class="auth-card" id="auth-screen">
         <h2>Welcome to Yapp</h2>
         <p>Stop talking, start yapping.</p>
@@ -147,25 +144,25 @@
             <label>Password</label>
             <input type="password" id="reg-pass" placeholder="••••••••">
         </div>
-        
         <div class="form-group">
-            <label>Choose Profile Color</label>
-            <div class="color-palette-grid">
-                <div class="palette-node selected" style="background: #ff4757;" onclick="selectPaletteColor('#ff4757', this)"></div>
-                <div class="palette-node" style="background: #ffa502;" onclick="selectPaletteColor('#ffa502', this)"></div>
-                <div class="palette-node" style="background: #eccc68;" onclick="selectPaletteColor('#eccc68', this)"></div>
-                <div class="palette-node" style="background: #2ed573;" onclick="selectPaletteColor('#2ed573', this)"></div>
-                <div class="palette-node" style="background: #1e90ff;" onclick="selectPaletteColor('#1e90ff', this)"></div>
-                <div class="palette-node" style="background: #3742fa;" onclick="selectPaletteColor('#3742fa', this)"></div>
-                <div class="palette-node" style="background: #8e44ad;" onclick="selectPaletteColor('#8e44ad', this)"></div>
-            </div>
+            <label>Profile Color</label>
+            <select id="reg-color">
+                <option value="#ff4757">🔥 Red</option>
+                <option value="#ffa502">🍊 Orange</option>
+                <option value="#eccc68">☀️ Yellow</option>
+                <option value="#2ed573">🌿 Green</option>
+                <option value="#1e90ff">💧 Blue</option>
+                <option value="#3742fa">🪻 Indigo</option>
+                <option value="#8e44ad">🍇 Violet</option>
+            </select>
         </div>
-        
         <button class="btn" id="login-btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
+    <!-- MAIN APP SCREEN -->
     <div class="app-container hidden" id="app-screen">
         
+        <!-- DESKTOP SIDEBAR -->
         <div class="sidebar">
             <div class="current-user-tag" id="user-profile-summary" style="cursor: pointer;" title="Click to Logout" onclick="handleSystemLogout()"></div>
             <div class="channels">
@@ -191,8 +188,10 @@
             <div class="brand-footer">BY CAVIAR STUDIOS © 2026</div>
         </div>
 
+        <!-- MAIN CHAT INTERFACE -->
         <div class="chat-main">
             
+            <!-- 📊 SECURED ADMIN METRICS & USER OVERLAY VAULT -->
             <div class="admin-dashboard-view" id="admin-panel-root-view">
                 <div class="modal-header">
                     <h2 style="font-size:1.3rem; font-weight:800; color:white; letter-spacing:-0.5px;">👑 Caviar Studios Server Core</h2>
@@ -205,6 +204,7 @@
                     <div class="metric-card"><h3>Active Channels</h3><div class="metric-value" id="metric-rooms">0</div></div>
                 </div>
 
+                <!-- ✨ NEW: Dynamic Registered Account Directory Table Framework -->
                 <div class="directory-wrap">
                     <h3 style="font-size: 1rem; font-weight: 700; color: white;">📋 Live Account Database</h3>
                     <div class="directory-table-container">
@@ -217,12 +217,15 @@
                                     <th>Color Hex</th>
                                 </tr>
                             </thead>
-                            <tbody id="admin-directory-rows-root"></tbody>
+                            <tbody id="admin-directory-rows-root">
+                                <!-- Users rows populate natively here -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- 📱 MOBILE NAVIGATION DRAWER -->
             <div class="mobile-modal" id="chats-overlay-modal">
                 <div class="modal-header">
                     <h3 id="mobile-modal-title-logout" style="font-size: 1.1rem; font-weight: bold; cursor: pointer; color: #71717a;" onclick="handleSystemLogout()">Logout 🚪</h3>
@@ -273,76 +276,49 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const SUPABASE_URL = 'https://jbgodvduntlpblubkpxj.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCIOiIkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZ29kdmR1bnRscGJsdWJrcHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzk2NjEsImV4cCI6MjA5NjkxNTY2MX0.4wOvYohtw9U0bGrHaV2RHvJFoJqhKVZxBZf09z_1lE'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZ29kdmR1bnRscGJsdWJrcHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzk2NjEsImV4cCI6MjA5NjkxNTY2MX0.4wOvYohtw9U0bGrHaV2RHvJFoJqhQKVZxBZf09z_1lE'; 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null; 
     let currentTab = 'global'; 
     let activeDms = []; 
-    let selectedProfileColor = '#ff4757'; 
 
-    window.addEventListener('DOMContentLoaded', () => { 
-        checkSavedUserSession(); 
-    });
+    window.addEventListener('DOMContentLoaded', () => { checkSavedUserSession(); });
 
     function showError(text) {
         const errBox = document.getElementById('error-message');
-        errBox.innerText = text; errBox.style.display = 'block';
+        errBox.innerText = text;
+        errBox.style.display = 'block';
     }
 
     function clearError() { document.getElementById('error-message').style.display = 'none'; }
-
-    function selectPaletteColor(colorHex, elementNode) {
-        selectedProfileColor = colorHex;
-        document.querySelectorAll('.palette-node').forEach(node => node.classList.remove('selected'));
-        elementNode.classList.add('selected');
-    }
 
     function checkSavedUserSession() {
         const savedSession = localStorage.getItem('yapp_cached_user');
         if (savedSession) {
             try {
-                const parsed = JSON.parse(savedSession);
-                if (parsed && parsed.username && parsed.tag) {
-                    currentUser = {
-                        username: parsed.username,
-                        tag: parsed.tag,
-                        color: parsed.color || '#3f3f46',
-                        fullTag: parsed.fullTag || `${parsed.username}${parsed.tag}`
-                    };
-                    initializeMainApplicationView();
-                    return; // Safety breakout
-                }
+                currentUser = JSON.parse(savedSession);
+                initializeMainApplicationView();
             } catch (e) {
                 localStorage.removeItem('yapp_cached_user');
             }
         }
-        // If memory is blank, force render the auth-wall smoothly
-        document.getElementById('auth-screen').classList.remove('hidden');
     }
 
     async function initializeMainApplicationView() {
-        if (!currentUser) return;
-
-        // 🛠️ HARD FALLBACK FIX: Instantly strip hidden flags off the container to bypass any silent loop crashes
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('app-screen').classList.remove('hidden');
-
         document.getElementById('user-profile-summary').innerHTML = `
             <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
             <div>${currentUser.username}<span>${currentUser.tag}</span></div>
         `;
-        
         const mobTitle = document.getElementById('mobile-modal-title-logout');
-        if (mobTitle) mobTitle.innerText = `${currentUser.fullTag} (Logout 🚪)`;
+        if (mobTitle) mobTitle.innerText = `${currentUser.username}${currentUser.tag} (Logout 🚪)`;
+
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
         
         evaluateAdminPermissions();
-        
-        // 🛠️ ASYNC SAFE CHAIN: Fire layout renders instantly, query database in background threads
-        renderDmList(); 
-        switchTab('global', '🌍 global-yapp');
-        
-        autoDiscoverRooms();
+        await autoDiscoverRooms();
+        fetchMessages();
         listenForNewMessages();
     }
 
@@ -357,6 +333,7 @@
         const username = document.getElementById('reg-user').value.trim();
         let tag = document.getElementById('reg-tag').value.trim();
         const pass = document.getElementById('reg-pass').value;
+        const color = document.getElementById('reg-color').value;
 
         if(!username || !pass) { showError('Fill in your details, bro!'); return; }
         if(!tag.startsWith('#')) { tag = '#' + tag; }
@@ -389,9 +366,9 @@
                     loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
                     return;
                 }
-                const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color: selectedProfileColor }]);
+                const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color }]);
                 if (insertError) throw insertError;
-                currentUser = { username, tag, color: selectedProfileColor, fullTag: `${username}${tag}` };
+                currentUser = { username, tag, color, fullTag: `${username}${tag}` };
             }
 
             localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
@@ -421,12 +398,14 @@
         }
     }
 
+    // ✨ UPDATED: ADMIN PANEL INJECTS ENTIRE ACCOUNT DIRECTORY RECORDSET
     async function toggleAdminPanelOverlay(show) {
         const panel = document.getElementById('admin-panel-root-view');
         if(!show) { panel.style.display = 'none'; return; }
         
         panel.style.display = 'flex';
         try {
+            // Fetch total count values
             const { data: allUsers, error: usersErr } = await supabaseClient.from('users').select('*').order('username', { ascending: true });
             const { count: msgCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true });
             const { data: uniqueRooms } = await supabaseClient.from('messages').select('room');
@@ -439,6 +418,7 @@
             document.getElementById('metric-messages').innerText = msgCount || 0;
             document.getElementById('metric-rooms').innerText = roomSet.size || 1;
 
+            // Render live database user objects row by row
             const rowsContainer = document.getElementById('admin-directory-rows-root');
             rowsContainer.innerHTML = '';
 
@@ -452,7 +432,10 @@
                 `;
                 rowsContainer.appendChild(tr);
             });
-        } catch(e) { console.error(e); }
+
+        } catch(e) {
+            console.error("Database user tracking core diagnostic failure:", e);
+        }
     }
 
     async function nukeGlobalChatLog() {
@@ -465,7 +448,6 @@
     }
 
     async function autoDiscoverRooms() {
-        if (!currentUser) return;
         try {
             const { data, error } = await supabaseClient.from('messages').select('room').not('room', 'is', null).not('room', 'eq', 'global');
             if (error) throw error;
@@ -499,7 +481,7 @@
         const crewTitle = nameInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
         const rawTags = tagsInput.value.trim().toLowerCase();
 
-        if(!crewTitle || !rawTags || !currentUser) return;
+        if(!crewTitle || !rawTags) return;
 
         let memberList = rawTags.split(',').map(t => t.trim()).filter(Boolean);
         memberList.push(currentUser.fullTag.toLowerCase());
@@ -523,7 +505,6 @@
     function handleDmTargetKey(e) { if(e.key === 'Enter') triggerMobileDmSubmit(false); }
 
     function triggerMobileDmSubmit(isFromMobileModal = false) {
-        if (!currentUser) return;
         const inputId = isFromMobileModal ? 'mobile-dm-target-input' : 'dm-target-input';
         const targetInput = document.getElementById(inputId);
         const targetUser = targetInput.value.trim();
@@ -618,7 +599,6 @@
     }
 
     async function dispatchMessage() {
-        if (!currentUser) return;
         const input = document.getElementById('chat-raw-input');
         const text = input.value.trim(); if(!text) return;
 
