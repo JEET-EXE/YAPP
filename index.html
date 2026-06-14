@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yapp by Caviar Studios</title>
     
-    <!-- 💎 MAGIC AUTO-GENERATED CAVIAR STUDIOS GOLD DIAMOND ICON -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
 
-    <!-- Dynamic Blob-Manifest Generator for Desktop Shortcuts -->
     <script>
         const manifestContent = {
             "name": "Yapp by Caviar Studios",
@@ -87,6 +85,9 @@
         .chan-btn:active { transform: scale(0.98); }
         .chan-left { display: flex; align-items: center; gap: 8px; min-width: 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
         
+        /* ✨ RED NOTIFICATION DOT BADGE SYST */
+        .unread-dot-badge { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block; flex-shrink: 0; box-shadow: 0 0 8px #ef4444; }
+
         .nuke-room-trigger { color: #71717a; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; transition: all 0.15s ease; font-weight: bold; }
         .nuke-room-trigger:hover { background: #ef4444; color: white; transform: scale(1.1); }
 
@@ -151,6 +152,12 @@
         .nav-item { color: #a1a1aa; font-size: 0.9rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 50%; height: 100%; justify-content: center; transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; }
         .nav-item.active { color: #f4f4f5; background: #27272a; }
 
+        /* ✨ NEW: OFFLINE SYSTEM NOTIFICATION MODAL DIALOG POPUP */
+        .offline-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 5, 6, 0.85); display: flex; justify-content: center; align-items: center; z-index: 999999; backdrop-filter: blur(8px); animation: popUp 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+        .offline-alert-box { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 25px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); text-align: center; display: flex; flex-direction: column; gap: 15px; }
+        .offline-alert-box h3 { color: #eccc68; font-size: 1.2rem; font-weight: bold; letter-spacing: -0.3px; }
+        .offline-alert-box p { color: #d4d4d8; font-size: 0.95rem; line-height: 1.4; word-break: break-word; }
+
         @media (max-width: 768px) {
             .app-container { width: 100vw; max-width: 100vw; height: 100%; max-height: 100%; border-radius: 0; border: none; display: flex; flex-direction: column; }
             .sidebar { display: none !important; } 
@@ -161,7 +168,6 @@
 </head>
 <body>
 
-    <!-- AUTH WALL -->
     <div class="auth-card" id="auth-screen">
         <h2>Welcome to Yapp</h2>
         <p>Stop talking, start yapping.</p>
@@ -200,7 +206,6 @@
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
     <div class="app-container hidden" id="app-screen">
         
         <div class="sidebar">
@@ -230,7 +235,6 @@
 
         <div class="chat-main">
             
-            <!-- 📊 ADMIN PANEL VIEW -->
             <div class="admin-dashboard-view" id="admin-panel-root-view">
                 <div class="modal-header">
                     <h2 style="font-size:1.3rem; font-weight:800; color:white; letter-spacing:-0.5px;">👑 Caviar Studios Server Core</h2>
@@ -262,7 +266,6 @@
                 </div>
             </div>
 
-            <!-- MOBILE MODAL DRAWER -->
             <div class="mobile-modal" id="chats-overlay-modal">
                 <div class="modal-header">
                     <h3 id="mobile-modal-title-logout" style="font-size: 1.1rem; font-weight: bold; cursor: pointer; color: #71717a;" onclick="handleSystemLogout()">Logout 🚪</h3>
@@ -319,6 +322,9 @@
     let currentUser = null; 
     let currentTab = 'global'; 
     let activeDms = []; 
+    
+    // ✨ NEW: Local array to map channels containing unread logs waiting for click responses
+    let roomsWithUnreadBadges = [];
 
     window.addEventListener('DOMContentLoaded', () => { checkSavedUserSession(); });
 
@@ -374,6 +380,10 @@
         
         evaluateAdminPermissions();
         await autoDiscoverRooms();
+        
+        // ✨ NEW: Trigger background offline message scanner on boot activation
+        await runOfflineMessageScanner();
+        
         fetchMessages();
         listenForNewMessages();
     }
@@ -522,21 +532,15 @@
         } catch(e) { console.error(e); }
     }
 
-    // ✨ FIXED CASE-SENSITIVITY DATA WIPE PROTOCOL
     async function dropTheBanHammer(targetUser, targetTag) {
         const fullCombo = `${targetUser}${targetTag}`;
         if(currentUser.fullTag !== 'ADMIN#67676') return;
         if(!confirm(`⚠️ WARNING: Are you sure you want to completely destroy ${fullCombo}? \nThis will wipe all their messages, flush their profile data, and block their login token forever!`)) return;
 
         try {
-            // 1. Permanently blacklist the user sequence
             await supabaseClient.from('bans').insert([{ target_fulltag: fullCombo.toLowerCase() }]);
-            // 2. Kill the user out of the main directory table row
             await supabaseClient.from('users').delete().eq('username', targetUser).eq('tag', targetTag);
-            
-            // 3. 🚨 FIX: Case-insensitive query block wipes messages regardless of how the username capitalization was stored!
             await supabaseClient.from('messages').delete().ilike('sender', targetUser).eq('tag', targetTag);
-            
             await refreshLiveDatabaseDirectory();
             fetchMessages();
             alert(`🔨 Ban Hammer deployed! ${fullCombo} has been vaporized and recycled.`);
@@ -579,6 +583,63 @@
             activeDms = Array.from(foundDms);
             renderDmList();
         } catch(e) { console.error(e); }
+    }
+
+    // ✨ NEW: OFFLINE BACKGROUND LOG DATA SCANNER CORE
+    async function runOfflineMessageScanner() {
+        if (!currentUser) return;
+        try {
+            // Pull the last 50 entries to scan for background arrivals
+            const { data: recentYaps, error } = await supabaseClient.from('messages').select('*').order('created_at', { ascending: false }).limit(50);
+            if (error) throw error;
+
+            const lowerUserTag = currentUser.fullTag.toLowerCase();
+            let unreadSendersList = new Set();
+
+            (recentYaps || []).forEach(yap => {
+                const senderSignature = `${yap.sender}${yap.tag}`;
+                if (senderSignature.toLowerCase() !== lowerUserTag) {
+                    const r = yap.room ? yap.room.toLowerCase() : 'global';
+                    
+                    if (r.startsWith('group_')) {
+                        const members = r.replace('group_', '').split('-');
+                        if (members.includes(lowerUserTag)) {
+                            roomsWithUnreadBadges.push(r);
+                            unreadSendersList.add(`👥 #${r.split('_')[1].toUpperCase()}`);
+                        }
+                    } else if (r !== 'global') {
+                        const structuralParts = r.split('_');
+                        if (structuralParts.includes(lowerUserTag)) {
+                            roomsWithUnreadBadges.push(r);
+                            unreadSendersList.add(`💬 ${yap.sender}${yap.tag}`);
+                        }
+                    }
+                }
+            });
+
+            // If background rows exist, summon the alert popup layout framework
+            if (unreadSendersList.size > 0) {
+                const overlay = document.createElement('div');
+                overlay.className = 'offline-modal-overlay';
+                overlay.id = 'offline-popup-guard-root';
+                
+                overlay.innerHTML = `
+                    <div class="offline-alert-box">
+                        <h3>🚨 UNREAD DATA DETECTED</h3>
+                        <p>Welcome back! You have unread background messages waiting inside your feed from:<br><br><strong>${Array.from(unreadSendersList).join(', ')}</strong></p>
+                        <button class="btn" onclick="dismissOfflineNotificationModal()">OK, Show Me</button>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            }
+        } catch(e) { console.error("Offline diagnostic error:", e); }
+    }
+
+    // ✨ NEW: Dismiss popup cleaner node
+    function dismissOfflineNotificationModal() {
+        const modal = document.getElementById('offline-popup-guard-root');
+        if(modal) modal.remove();
+        renderDmList(); // Forces red badges to inject cleanly into sidebar rows
     }
 
     async function createGroupCrewChannel(isFromMobile = false) {
@@ -652,24 +713,33 @@
             const isGroup = id.startsWith('group_');
             const displayName = isGroup ? `👥 ${id.split('_')[1].toUpperCase()}` : `💬 ${id}`;
             const targetRoomKey = isGroup ? id : getRoomId(currentUser.fullTag, id);
+            const lowerKey = targetRoomKey.toLowerCase();
+
+            // ✨ NEW: Injects a glowing red dot span element if room key exists inside unread sheet arrays
+            const needsDotBadge = roomsWithUnreadBadges.includes(lowerKey);
+            const badgeIndicatorHtml = needsDotBadge ? `<span class="unread-dot-badge"></span>` : '';
 
             const btnDesktop = document.createElement('div');
-            btnDesktop.className = `chan-btn ${currentTab === targetRoomKey.toLowerCase() ? 'active' : ''}`;
+            btnDesktop.className = `chan-btn ${currentTab === lowerKey ? 'active' : ''}`;
             btnDesktop.onclick = () => switchTab(targetRoomKey, displayName);
-            btnDesktop.innerHTML = `<div class="chan-left">${displayName}</div><div class="nuke-room-trigger" onclick="nukeChatRoom('${targetRoomKey}', event)">✕</div>`;
+            btnDesktop.innerHTML = `<div class="chan-left">${displayName} ${badgeIndicatorHtml}</div><div class="nuke-room-trigger" onclick="nukeChatRoom('${targetRoomKey}', event)">✕</div>`;
             desktopContainer.appendChild(btnDesktop);
 
             const btnMobile = document.createElement('div');
-            btnMobile.className = `chan-btn ${currentTab === targetRoomKey.toLowerCase() ? 'active' : ''}`;
+            btnMobile.className = `chan-btn ${currentTab === lowerKey ? 'active' : ''}`;
             btnMobile.style.padding = "16px 12px"; btnMobile.style.background = "#18181b"; btnMobile.style.border = "1px solid #27272a";
             btnMobile.onclick = () => { switchTab(targetRoomKey, displayName); toggleMobileModal(false); updateMobileNavHighlights('chats'); };
-            btnMobile.innerHTML = `<div class="chan-left" style="font-size: 1rem; font-weight: 500;">${displayName}</div><div class="nuke-room-trigger" style="font-size: 1.1rem; padding: 6px 12px;" onclick="nukeChatRoom('${targetRoomKey}', event)">✕</div>`;
+            btnMobile.innerHTML = `<div class="chan-left" style="font-size: 1rem; font-weight: 500;">${displayName} ${badgeIndicatorHtml}</div><div class="nuke-room-trigger" style="font-size: 1.1rem; padding: 6px 12px;" onclick="nukeChatRoom('${targetRoomKey}', event)">✕</div>`;
             mobileContainer.appendChild(btnMobile);
         });
     }
 
     function switchTab(tabId, titleText = '🌍 global-yapp') {
         currentTab = tabId.toLowerCase();
+        
+        // ✨ NEW: Pop target room key out of unread array loop the absolute split-second the tab opens
+        roomsWithUnreadBadges = roomsWithUnreadBadges.filter(r => r !== currentTab);
+
         document.getElementById('global-chan-btn').classList.toggle('active', currentTab === 'global');
         document.getElementById('chat-title-text').innerText = titleText;
         
@@ -720,6 +790,8 @@
                 if (payload.eventType === 'DELETE') { autoDiscoverRooms(); fetchMessages(); return; }
                 if (payload.eventType === 'INSERT') {
                     const newMsg = payload.new;
+                    const targetRoomKeyLower = newMsg.room ? newMsg.room.toLowerCase() : 'global';
+
                     if (newMsg.room && newMsg.room !== 'global') {
                         const r = newMsg.room.toLowerCase();
                         if (r.startsWith('group_')) {
@@ -738,8 +810,20 @@
                         }
                     }
                     const isGlobalMatch = currentTab === 'global' && (!newMsg.room || newMsg.room.toLowerCase() === 'global');
-                    const isPrivateMatch = currentTab === (newMsg.room ? newMsg.room.toLowerCase() : '');
-                    if (isGlobalMatch || isPrivateMatch) fetchMessages();
+                    const isPrivateMatch = currentTab === targetRoomKeyLower;
+                    
+                    if (isGlobalMatch || isPrivateMatch) {
+                        fetchMessages();
+                    } else {
+                        // ✨ NEW: If a background insert hits while online, push to unread system sheet array and fire re-render
+                        const messageSenderFullTag = `${newMsg.sender}${newMsg.tag}`.toLowerCase();
+                        if(currentUser && messageSenderFullTag !== currentUser.fullTag.toLowerCase()) {
+                            if(!roomsWithUnreadBadges.includes(targetRoomKeyLower)) {
+                                roomsWithUnreadBadges.push(targetRoomKeyLower);
+                                renderDmList();
+                            }
+                        }
+                    }
                 }
             }).subscribe();
     }
