@@ -91,6 +91,11 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 10px; }
         .close-modal-btn { background: #27272a; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
 
+        /* 📱 NEW: Sleek layout frames for mobile side forms button clusters */
+        .mobile-inline-form-row { display: flex; gap: 6px; margin-top: 4px; width: 100%; }
+        .mobile-inline-form-row input { flex: 1; }
+        .mobile-inline-form-row button { background: #f4f4f5; color: #09090b; border: none; border-radius: 6px; padding: 0 16px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+
         /* 📊 ADMIN METRICS VIEW OVERLAY MODULE */
         .admin-dashboard-view { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0c0c0e; z-index: 1000; flex-direction: column; padding: 25px; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; }
@@ -196,12 +201,18 @@
                 <div style="background: #18181b; padding: 15px; border-radius: 8px; border: 1px solid #27272a; display:flex; flex-direction:column; gap:12px;">
                     <div>
                         <label>Start 1v1 DM</label>
-                        <input type="text" id="mobile-dm-target-input" placeholder="User#12345" style="width: 100%; padding: 10px; margin-top:4px;" onkeypress="if(event.key==='Enter') triggerMobileDmSubmit(true)">
+                        <div class="mobile-inline-form-row">
+                            <input type="text" id="mobile-dm-target-input" placeholder="User#12345" onkeypress="if(event.key==='Enter') triggerMobileDmSubmit(true)">
+                            <button onclick="triggerMobileDmSubmit(true)">Go</button>
+                        </div>
                     </div>
                     <div style="border-top:1px solid #27272a; padding-top:10px;">
                         <label>Build a Group Crew</label>
-                        <input type="text" id="mob-group-name-input" placeholder="Crew Name" style="width: 100%; padding: 10px; margin-top:4px; margin-bottom:4px;">
-                        <input type="text" id="mob-group-tags-input" placeholder="UserA#12,UserB#34" style="width: 100%; padding: 10px;" onkeypress="if(event.key==='Enter') createGroupCrewChannel(true)">
+                        <input type="text" id="mob-group-name-input" placeholder="Crew Name" style="width: 100%; padding: 12px; margin-top:4px; margin-bottom:6px;">
+                        <div class="mobile-inline-form-row">
+                            <input type="text" id="mob-group-tags-input" placeholder="UserA#12,UserB#34" onkeypress="if(event.key==='Enter') createGroupCrewChannel(true)">
+                            <button onclick="createGroupCrewChannel(true)">Go</button>
+                        </div>
                     </div>
                     <div id="mobile-admin-panel-trigger-slot"></div>
                 </div>
@@ -352,7 +363,6 @@
         }
     }
 
-    // ✨ NEW: ADMIN METRICS INTERCEPTOR ENGINE
     async function toggleAdminPanelOverlay(show) {
         const panel = document.getElementById('admin-panel-root-view');
         if(!show) { panel.style.display = 'none'; return; }
@@ -361,8 +371,6 @@
         try {
             const { count: usersCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
             const { count: msgCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true });
-            
-            // Query total distinct channel IDs mapping configurations
             const { data: uniqueRooms } = await supabaseClient.from('messages').select('room');
             const roomSet = new Set((uniqueRooms || []).map(m => m.room).filter(Boolean));
 
@@ -370,7 +378,7 @@
             document.getElementById('metric-messages').innerText = msgCount || 0;
             document.getElementById('metric-rooms').innerText = roomSet.size || 1;
         } catch(e) {
-            console.error("Metrics engine reporting fault:", e);
+            console.error(e);
         }
     }
 
@@ -393,10 +401,9 @@
 
             (data || []).forEach(msg => {
                 const r = msg.room.toLowerCase();
-                // Match single DMs (contains user) or Group Chats prefix blocks
                 if (r.startsWith('group_')) {
                     const members = r.replace('group_', '').split('-');
-                    if (members.includes(lowerTag)) foundDms.add(msg.room); // Save raw group name channel string
+                    if (members.includes(lowerTag)) foundDms.add(msg.room); 
                 } else {
                     const parts = r.split('_');
                     if (parts.includes(lowerTag)) {
@@ -411,7 +418,6 @@
         } catch(e) { console.error(e); }
     }
 
-    // ✨ NEW: ENGINE HOOK TO SPIN UP MULTI-USER GROUP CREW CHANNELS
     async function createGroupCrewChannel(isFromMobile = false) {
         const nameInput = document.getElementById(isFromMobile ? 'mob-group-name-input' : 'group-name-input');
         const tagsInput = document.getElementById(isFromMobile ? 'mob-group-tags-input' : 'group-tags-input');
@@ -421,18 +427,15 @@
 
         if(!crewTitle || !rawTags) return;
 
-        // Parse list arrays, inject the self creator account tag automatically
         let memberList = rawTags.split(',').map(t => t.trim()).filter(Boolean);
         memberList.push(currentUser.fullTag.toLowerCase());
-        memberList.sort(); // Align sequences predictably
+        memberList.sort(); 
 
-        // Form structure identifier string: group_title_user1-user2-user3
         const finalGroupId = `group_${crewTitle}_` + memberList.join('-');
 
         nameInput.value = ''; tagsInput.value = '';
         if(isFromMobile) toggleMobileModal(false);
 
-        // Dispatches seed hello message string to index the channel into visibility loops
         await supabaseClient.from('messages').insert([{
             sender: '🚨 System', tag: '#STUDIO', color: '#eccc68',
             text: `Welcome to the brand new ${crewTitle.toUpperCase()} Crew chat channel!`,
@@ -487,14 +490,12 @@
             const displayName = isGroup ? `👥 ${id.split('_')[1].toUpperCase()}` : `💬 ${id}`;
             const targetRoomKey = isGroup ? id : getRoomId(currentUser.fullTag, id);
 
-            // Render Desktop Anchor
             const btnDesktop = document.createElement('div');
             btnDesktop.className = `chan-btn ${currentTab === targetRoomKey.toLowerCase() ? 'active' : ''}`;
             btnDesktop.onclick = () => switchTab(targetRoomKey, displayName);
             btnDesktop.innerHTML = `<div class="chan-left">${displayName}</div><div class="nuke-room-trigger" onclick="nukeChatRoom('${targetRoomKey}', event)">✕</div>`;
             desktopContainer.appendChild(btnDesktop);
 
-            // Render Mobile Anchor
             const btnMobile = document.createElement('div');
             btnMobile.className = `chan-btn ${currentTab === targetRoomKey.toLowerCase() ? 'active' : ''}`;
             btnMobile.style.padding = "16px 12px"; btnMobile.style.background = "#18181b"; btnMobile.style.border = "1px solid #27272a";
