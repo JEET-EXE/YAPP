@@ -230,7 +230,7 @@
 
         <div class="chat-main">
             
-            <!-- 📊 ADMIN PANEL VIEW (STRICTLY HARD-LOCKED) -->
+            <!-- 📊 ADMIN PANEL VIEW -->
             <div class="admin-dashboard-view" id="admin-panel-root-view">
                 <div class="modal-header">
                     <h2 style="font-size:1.3rem; font-weight:800; color:white; letter-spacing:-0.5px;">👑 Caviar Studios Server Core</h2>
@@ -395,7 +395,6 @@
         if(!tag.startsWith('#')) { tag = '#' + tag; }
         if(tag.length < 2) { tag = '#12345'; }
 
-        // ✨ Lowercase mapping check for ban sheet scans
         const combinedTagLower = `${username}${tag}`.toLowerCase();
 
         const mainBtn = document.getElementById('login-action-btn');
@@ -441,7 +440,6 @@
                     mainBtn.disabled = false; secondaryBtn.disabled = false;
                     return;
                 }
-                // Stop anyone from stealing the 'admin' text string during registration
                 if (username.toLowerCase() === 'admin') {
                     showError('🚨 Nice try, bro! You cannot register a brand new Admin token name.');
                     mainBtn.disabled = false; secondaryBtn.disabled = false;
@@ -461,7 +459,6 @@
         }
     }
 
-    // 🛠️ HARD SECURITY RE-ENGINEERING: ONLY exact string match 'ADMIN#67676' gets admin tools!
     function evaluateAdminPermissions() {
         const nukeSlot = document.getElementById('admin-nuke-slot');
         const deskTrigger = document.getElementById('desktop-admin-panel-trigger-slot');
@@ -483,8 +480,6 @@
     async function toggleAdminPanelOverlay(show) {
         const panel = document.getElementById('admin-panel-root-view');
         if(!show) { panel.style.display = 'none'; return; }
-        
-        // Safety lock check
         if(currentUser.fullTag !== 'ADMIN#67676') return;
         
         panel.style.display = 'flex';
@@ -512,7 +507,6 @@
                 const tr = document.createElement('tr');
                 const fullStringTag = `${account.username}${account.tag}`;
                 
-                // 🔨 UNLOCKED BAN HAMMER: Only true 'ADMIN#67676' is immune! Lowercase fake admin accounts can now be completely deleted!
                 let operationActionNode = `<button class="ban-hammer-action" onclick="dropTheBanHammer('${account.username}', '${account.tag}')">💥 Ban</button>`;
                 if (fullStringTag === 'ADMIN#67676') { operationActionNode = `<span style="color:#71717a; font-size:0.75rem;">Immune</span>`; }
 
@@ -528,16 +522,23 @@
         } catch(e) { console.error(e); }
     }
 
+    // ✨ FIXED CASE-SENSITIVITY DATA WIPE PROTOCOL
     async function dropTheBanHammer(targetUser, targetTag) {
         const fullCombo = `${targetUser}${targetTag}`;
         if(currentUser.fullTag !== 'ADMIN#67676') return;
         if(!confirm(`⚠️ WARNING: Are you sure you want to completely destroy ${fullCombo}? \nThis will wipe all their messages, flush their profile data, and block their login token forever!`)) return;
 
         try {
+            // 1. Permanently blacklist the user sequence
             await supabaseClient.from('bans').insert([{ target_fulltag: fullCombo.toLowerCase() }]);
+            // 2. Kill the user out of the main directory table row
             await supabaseClient.from('users').delete().eq('username', targetUser).eq('tag', targetTag);
-            await supabaseClient.from('messages').delete().eq('sender', targetUser).eq('tag', targetTag);
+            
+            // 3. 🚨 FIX: Case-insensitive query block wipes messages regardless of how the username capitalization was stored!
+            await supabaseClient.from('messages').delete().ilike('sender', targetUser).eq('tag', targetTag);
+            
             await refreshLiveDatabaseDirectory();
+            fetchMessages();
             alert(`🔨 Ban Hammer deployed! ${fullCombo} has been vaporized and recycled.`);
         } catch(err) { alert('Ban execution error: ' + err.message); }
     }
