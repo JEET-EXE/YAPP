@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yapp by Caviar Studios</title>
     
-    <!-- 💎 MAGIC AUTO-GENERATED CAVIAR STUDIOS GOLD DIAMOND ICON -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
 
     <style>
@@ -33,7 +32,6 @@
         input { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: all 0.2s ease; }
         input:focus { border-color: #a1a1aa; background: #2e2e33; }
         
-        /* ✨ NEW: Interactive grid selector system for profile layout rings */
         .color-palette-grid { display: flex; gap: 10px; justify-content: center; padding: 8px 0; margin-bottom: 4px; }
         .palette-node { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
         .palette-node:hover { transform: scale(1.1); }
@@ -86,6 +84,14 @@
         .msg-delete-btn:hover { background: #3f3f46; color: #ef4444; }
         .msg-text { font-size: 0.95rem; color: #e4e4e7; word-break: break-word; }
 
+        /* Input Bar */
+        .input-container { padding: 16px; background: #0f0f11; }
+        /* 🛠️ FIXED LAYOUT: Re-injected layout display engines to force input row alignment */
+        .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; align-items: center; width: 100%; }
+        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; width: 100%; }
+        .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; height: 100%; }
+        .input-wrapper button:hover { color: #f4f4f5; }
+
         /* 📱 MOBILE MODAL OVERLAY FOR NAVIGATION DECK */
         .mobile-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 999; flex-direction: column; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
         .mobile-modal.slide-active { display: flex; animation: slideUpModal 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
@@ -124,7 +130,6 @@
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
     <div class="auth-card" id="auth-screen">
         <h2>Welcome to Yapp</h2>
         <p>Stop talking, start yapping.</p>
@@ -144,7 +149,6 @@
             <input type="password" id="reg-pass" placeholder="••••••••">
         </div>
         
-        <!-- ✨ NEW: Beautiful Circle Color Palette Grid Interface (Replaced Mid Dropdown) -->
         <div class="form-group">
             <label>Choose Profile Color</label>
             <div class="color-palette-grid">
@@ -161,10 +165,8 @@
         <button class="btn" id="login-btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
-    <!-- MAIN APP SCREEN -->
     <div class="app-container hidden" id="app-screen">
         
-        <!-- DESKTOP SIDEBAR -->
         <div class="sidebar">
             <div class="current-user-tag" id="user-profile-summary" style="cursor: pointer;" title="Click to Logout" onclick="handleSystemLogout()"></div>
             <div class="channels">
@@ -190,10 +192,8 @@
             <div class="brand-footer">BY CAVIAR STUDIOS © 2026</div>
         </div>
 
-        <!-- MAIN CHAT INTERFACE -->
         <div class="chat-main">
             
-            <!-- 📊 SECURED ADMIN METRICS & USER OVERLAY VAULT -->
             <div class="admin-dashboard-view" id="admin-panel-root-view">
                 <div class="modal-header">
                     <h2 style="font-size:1.3rem; font-weight:800; color:white; letter-spacing:-0.5px;">👑 Caviar Studios Server Core</h2>
@@ -224,7 +224,6 @@
                 </div>
             </div>
 
-            <!-- 📱 MOBILE NAVIGATION DRAWER -->
             <div class="mobile-modal" id="chats-overlay-modal">
                 <div class="modal-header">
                     <h3 id="mobile-modal-title-logout" style="font-size: 1.1rem; font-weight: bold; cursor: pointer; color: #71717a;" onclick="handleSystemLogout()">Logout 🚪</h3>
@@ -275,14 +274,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const SUPABASE_URL = 'https://jbgodvduntlpblubkpxj.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZ29kdmR1bnRscGJsdWJrcHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzk2NjEsImV4cCI6MjA5NjkxNTY2MX0.4wOvYohtw9U0bGrHaV2RHvJFoJqhQKVZxBZf09z_1lE'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZ29kdmR1bnRscGJsdWJrcHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzk2NjEsImV4cCI6MjA5NjkxNTY2MX0.4wOvYohtw9U0bGrHaV2RHvJFoJqhKVZxBZf09z_1lE'; 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null; 
     let currentTab = 'global'; 
     let activeDms = []; 
-    
-    // ✨ Global tracking variable for selected grid value defaults to Red
     let selectedProfileColor = '#ff4757'; 
 
     window.addEventListener('DOMContentLoaded', () => { checkSavedUserSession(); });
@@ -295,13 +292,9 @@
 
     function clearError() { document.getElementById('error-message').style.display = 'none'; }
 
-    // ✨ NEW: Handles smooth layout tracking changes inside registration menu grid loops
     function selectPaletteColor(colorHex, elementNode) {
         selectedProfileColor = colorHex;
-        
-        // Wipe active border flags off nodes
         document.querySelectorAll('.palette-node').forEach(node => node.classList.remove('selected'));
-        // Light up the chosen aesthetic circle
         elementNode.classList.add('selected');
     }
 
@@ -377,7 +370,6 @@
                     loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
                     return;
                 }
-                // ✨ Injects the interactive selected Profile Color grid value seamlessly
                 const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color: selectedProfileColor }]);
                 if (insertError) throw insertError;
                 currentUser = { username, tag, color: selectedProfileColor, fullTag: `${username}${tag}` };
