@@ -273,7 +273,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const SUPABASE_URL = 'https://jbgodvduntlpblubkpxj.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZ29kdmR1bnRscGJsdWJrcHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzk2NjEsImV4cCI6MjA5NjkxNTY2MX0.4wOvYohtw9U0bGrHaV2RHvJFoJqhKVZxBZf09z_1lE'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCIOiIkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZ29kdmR1bnRscGJsdWJrcHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzk2NjEsImV4cCI6MjA5NjkxNTY2MX0.4wOvYohtw9U0bGrHaV2RHvJFoJqhKVZxBZf09z_1lE'; 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null; 
@@ -281,15 +281,13 @@
     let activeDms = []; 
     let selectedProfileColor = '#ff4757'; 
 
-    // 🛠️ BUGFIX: Delay initialization until the system fully triggers DOM structures
     window.addEventListener('DOMContentLoaded', () => { 
-        setTimeout(checkSavedUserSession, 100); 
+        checkSavedUserSession(); 
     });
 
     function showError(text) {
         const errBox = document.getElementById('error-message');
-        errBox.innerText = text;
-        errBox.style.display = 'block';
+        errBox.innerText = text; errBox.style.display = 'block';
     }
 
     function clearError() { document.getElementById('error-message').style.display = 'none'; }
@@ -305,7 +303,6 @@
         if (savedSession) {
             try {
                 const parsed = JSON.parse(savedSession);
-                // 🛠️ BUGFIX: Enforce structural safety properties on storage extraction
                 if (parsed && parsed.username && parsed.tag) {
                     currentUser = {
                         username: parsed.username,
@@ -314,32 +311,38 @@
                         fullTag: parsed.fullTag || `${parsed.username}${parsed.tag}`
                     };
                     initializeMainApplicationView();
-                } else {
-                    localStorage.removeItem('yapp_cached_user');
+                    return; // Safety breakout
                 }
             } catch (e) {
-                console.error("Cache reconstruction failure:", e);
                 localStorage.removeItem('yapp_cached_user');
             }
         }
+        // If memory is blank, force render the auth-wall smoothly
+        document.getElementById('auth-screen').classList.remove('hidden');
     }
 
     async function initializeMainApplicationView() {
         if (!currentUser) return;
 
+        // 🛠️ HARD FALLBACK FIX: Instantly strip hidden flags off the container to bypass any silent loop crashes
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+
         document.getElementById('user-profile-summary').innerHTML = `
             <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
             <div>${currentUser.username}<span>${currentUser.tag}</span></div>
         `;
+        
         const mobTitle = document.getElementById('mobile-modal-title-logout');
         if (mobTitle) mobTitle.innerText = `${currentUser.fullTag} (Logout 🚪)`;
-
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('app-screen').classList.remove('hidden');
         
         evaluateAdminPermissions();
-        await autoDiscoverRooms();
-        fetchMessages();
+        
+        // 🛠️ ASYNC SAFE CHAIN: Fire layout renders instantly, query database in background threads
+        renderDmList(); 
+        switchTab('global', '🌍 global-yapp');
+        
+        autoDiscoverRooms();
         listenForNewMessages();
     }
 
