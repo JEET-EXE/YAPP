@@ -60,10 +60,16 @@
         label { font-size: 0.8rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; }
         input, select { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: all 0.2s ease; }
         input:focus, select:focus { border-color: #a1a1aa; background: #2e2e33; }
-        .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; margin-top: 10px; width: 100%; transition: all 0.2s ease; }
+        
+        /* Two-Button Framework layout system */
+        .auth-btn-row { display: flex; gap: 10px; margin-top: 10px; }
+        .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; width: 100%; transition: all 0.2s ease; }
         .btn:hover { background: #e4e4e7; transform: translateY(-1px); }
+        .btn-secondary { background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; }
+        .btn-secondary:hover { background: #3f3f46; }
         
         .error-banner { background: #ef4444; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; display: none; font-weight: 500; animation: popUp 0.2s ease-out; }
+        .success-banner { background: #2ed573; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; display: none; font-weight: 500; animation: popUp 0.2s ease-out; }
 
         /* Main Layout */
         .app-container { width: 100%; max-width: 900px; height: 85vh; background: #121214; border-radius: 12px; border: 1px solid #27272a; display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); animation: popUp 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
@@ -75,7 +81,7 @@
         .current-user-tag span { color: #a1a1aa; font-size: 0.8rem; font-weight: normal; }
         .channels { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
         
-        /* Standard Channel Row Framework */
+        /* Channel Buttons */
         .chan-btn { padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; color: #a1a1aa; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: all 0.2s ease; }
         .chan-btn:hover, .chan-btn.active { background: #27272a; color: #f4f4f5; }
         .chan-btn:active { transform: scale(0.98); }
@@ -84,7 +90,7 @@
         .nuke-room-trigger { color: #71717a; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; transition: all 0.15s ease; font-weight: bold; }
         .nuke-room-trigger:hover { background: #ef4444; color: white; transform: scale(1.1); }
 
-        /* Multi-Functional Side Forms */
+        /* Sidebar Forms */
         .sidebar-forms-deck { padding: 12px; border-top: 1px solid #27272a; display: flex; flex-direction: column; gap: 12px; background: #18181b; }
         .sidebar-forms-deck label { font-size: 0.75rem; }
         .sidebar-forms-deck input { padding: 6px 8px; font-size: 0.8rem; }
@@ -96,7 +102,7 @@
         .chat-header { padding: 14px 20px; border-bottom: 1px solid #27272a; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .messages-pane { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         
-        /* Message Layout */
+        /* Message Rows */
         .message-row { display: flex; gap: 12px; align-items: flex-start; animation: msgSlide 0.25s cubic-bezier(0.215, 0.610, 0.355, 1); }
         .msg-content { display: flex; flex-direction: column; gap: 3px; position: relative; width: 100%; }
         .msg-meta { font-size: 0.85rem; font-weight: 600; color: #f4f4f5; display: flex; align-items: center; gap: 6px; }
@@ -114,7 +120,7 @@
         .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
         .input-wrapper button:hover { color: #f4f4f5; }
 
-        /* 📱 MOBILE MODAL OVERLAY FOR NAVIGATION DECK */
+        /* Mobile Modal */
         .mobile-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 999; flex-direction: column; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
         .mobile-modal.slide-active { display: flex; animation: slideUpModal 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 10px; }
@@ -124,13 +130,12 @@
         .mobile-inline-form-row input { flex: 1; }
         .mobile-inline-form-row button { background: #f4f4f5; color: #09090b; border: none; border-radius: 6px; padding: 0 16px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
 
-        /* 📊 ADMIN METRICS VIEW OVERLAY MODULE */
+        /* Admin Dashboard Overlay */
         .admin-dashboard-view { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0c0c0e; z-index: 1000; flex-direction: column; padding: 25px; overflow-y: auto; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; margin-bottom: 24px; }
         .metric-card { background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; text-align: center; }
         .metric-value { font-size: 2.2rem; font-weight: 800; color: #eccc68; margin-top: 8px; }
 
-        /* User directory layout styles */
         .directory-wrap { flex: 1; background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; min-height: 250px; }
         .directory-table-container { flex: 1; overflow-y: auto; margin-top: 12px; }
         .directory-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
@@ -138,7 +143,7 @@
         .directory-table th { color: #a1a1aa; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
         .directory-table td { color: #e4e4e7; }
 
-        /* 📱 MOBILE NAVIGATION BAR */
+        /* Mobile Nav */
         .mobile-nav-bar { display: none; background: #18181b; border-top: 1px solid #27272a; height: 65px; min-height: 65px; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { color: #a1a1aa; font-size: 0.9rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 50%; height: 100%; justify-content: center; transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; }
         .nav-item.active { color: #f4f4f5; background: #27272a; }
@@ -159,11 +164,12 @@
         <p style="color: #eccc68; font-weight: 500; letter-spacing: 0.3px; margin-bottom: 24px; font-size: 0.8rem;">A Caviar Studios Production</p>
         
         <div id="error-message" class="error-banner"></div>
+        <div id="success-message" class="success-banner"></div>
 
         <div class="form-group">
             <label>Username</label>
             <div class="form-row">
-                <input type="text" id="reg-user" placeholder="e.g., ToxicYapper" style="flex: 1;">
+                <input type="text" id="reg-user" placeholder="e.g., KJ" style="flex: 1;">
                 <input type="text" id="reg-tag" placeholder="#12345" style="width: 90px;" maxlength="6">
             </div>
         </div>
@@ -183,7 +189,11 @@
                 <option value="#8e44ad">🍇 Violet</option>
             </select>
         </div>
-        <button class="btn" id="login-btn" onclick="handleLogin()">Login / Register</button>
+        
+        <div class="auth-btn-row">
+            <button class="btn" id="login-action-btn" onclick="executeAuthenticationFlow('LOGIN')">Login</button>
+            <button class="btn btn-secondary" id="register-action-btn" onclick="executeAuthenticationFlow('REGISTER')">Register</button>
+        </div>
     </div>
 
     <div class="app-container hidden" id="app-screen">
@@ -239,8 +249,7 @@
                                     <th>Color Hex</th>
                                 </tr>
                             </thead>
-                            <tbody id="admin-directory-rows-root">
-                                </tbody>
+                            <tbody id="admin-directory-rows-root"></tbody>
                         </table>
                     </div>
                 </div>
@@ -306,12 +315,21 @@
     window.addEventListener('DOMContentLoaded', () => { checkSavedUserSession(); });
 
     function showError(text) {
+        document.getElementById('success-message').style.display = 'none';
         const errBox = document.getElementById('error-message');
-        errBox.innerText = text;
-        errBox.style.display = 'block';
+        errBox.innerText = text; errBox.style.display = 'block';
     }
 
-    function clearError() { document.getElementById('error-message').style.display = 'none'; }
+    function showSuccess(text) {
+        document.getElementById('error-message').style.display = 'none';
+        const succBox = document.getElementById('success-message');
+        succBox.innerText = text; succBox.style.display = 'block';
+    }
+
+    function clearStatusBanners() {
+        document.getElementById('error-message').style.display = 'none';
+        document.getElementById('success-message').style.display = 'none';
+    }
 
     function checkSavedUserSession() {
         const savedSession = localStorage.getItem('yapp_cached_user');
@@ -348,8 +366,9 @@
         window.location.reload(); 
     }
 
-    async function handleLogin() {
-        clearError();
+    // ✨ UPDATED DETONATION AUTH CORE ROUTER
+    async function executeAuthenticationFlow(mode) {
+        clearStatusBanners();
         const username = document.getElementById('reg-user').value.trim();
         let tag = document.getElementById('reg-tag').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -359,12 +378,13 @@
         if(!tag.startsWith('#')) { tag = '#' + tag; }
         if(tag.length < 2) { tag = '#12345'; }
 
-        const loginBtn = document.getElementById('login-btn');
-        loginBtn.innerText = "Checking..."; loginBtn.disabled = true;
+        const mainBtn = document.getElementById('login-action-btn');
+        const secondaryBtn = document.getElementById('register-action-btn');
+        mainBtn.disabled = true; secondaryBtn.disabled = true;
 
         try {
-            // ✨ SECURED: Query database for the exact unique combo of BOTH username AND tag
-            const { data: accountRow, error: fetchError } = await supabaseClient
+            // Fetch account status checking BOTH user and tag simultaneously
+            const { data: userRow, error: fetchError } = await supabaseClient
                 .from('users')
                 .select('*')
                 .eq('username', username)
@@ -373,33 +393,45 @@
 
             if (fetchError) throw fetchError;
 
-            if (accountRow) {
-                // If account exists, perform strict standard login authentication pass check
-                if (accountRow.password !== pass) {
-                    showError('❌ Wrong password for this account, bro!');
-                    loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
+            if (mode === 'LOGIN') {
+                if (!userRow) {
+                    showError('❌ Account not found! Double check your tag or hit Register, bro.');
+                    mainBtn.disabled = false; secondaryBtn.disabled = false;
                     return;
                 }
-                currentUser = { username: accountRow.username, tag: accountRow.tag, color: accountRow.color, fullTag: `${accountRow.username}${accountRow.tag}` };
-            } else {
-                // ✨ HARD LOCK SECURITY VALVE: Instantly deny any random registrations trying to hijack the 'admin' mantle
+                if (userRow.password !== pass) {
+                    showError('❌ Wrong password for this account, bro!');
+                    mainBtn.disabled = false; secondaryBtn.disabled = false;
+                    return;
+                }
+                currentUser = { username: userRow.username, tag: userRow.tag, color: userRow.color, fullTag: `${userRow.username}${userRow.tag}` };
+                localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
+                initializeMainApplicationView();
+            } 
+            
+            else if (mode === 'REGISTER') {
+                if (userRow) {
+                    showError(`❌ Profile combination ${username}${tag} already registered! Try Logging in.`);
+                    mainBtn.disabled = false; secondaryBtn.disabled = false;
+                    return;
+                }
+                // Strict anti-hijacking shield block
                 if (username.toLowerCase() === 'admin') {
-                    showError('🚨 Nice try, bro. You can\'t register a new Admin account!');
-                    loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
+                    showError('🚨 Nice try, bro! You cannot register a brand new Admin token name.');
+                    mainBtn.disabled = false; secondaryBtn.disabled = false;
                     return;
                 }
 
-                // If combination doesn't exist, create it cleanly! Completely safe from collision blocks!
                 const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color }]);
                 if (insertError) throw insertError;
-                currentUser = { username, tag, color, fullTag: `${username}${tag}` };
+                
+                showSuccess('🎉 Account registered successfully! Click Login to enter the lobby.');
+                mainBtn.disabled = false; secondaryBtn.disabled = false;
             }
 
-            localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
-            initializeMainApplicationView();
         } catch (err) {
-            showError('Database error: ' + err.message);
-            loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
+            showError('Database logic error: ' + err.message);
+            mainBtn.disabled = false; secondaryBtn.disabled = false;
         }
     }
 
@@ -452,10 +484,7 @@
                 `;
                 rowsContainer.appendChild(tr);
             });
-
-        } catch(e) {
-            console.error("Database user tracking core diagnostic failure:", e);
-        }
+        } catch(e) { console.error(e); }
     }
 
     async function nukeGlobalChatLog() {
