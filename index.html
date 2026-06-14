@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yapp by Caviar Studios</title>
     
-    <!-- 💎 MAGIC AUTO-GENERATED CAVIAR STUDIOS GOLD DIAMOND ICON -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
 
-    <!-- 🍎 APPL/MAC SAVED HOME SCREEN ICON OVERRIDE -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
 
-    <!-- 📱 WINDOWS DESKTOP SHORTCUT MANIFEST LAYER -->
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Yapp%20by%20Caviar%20Studios%22,%22short_name%22:%22Yapp%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%2309090b%22,%22theme_color%22:%22%2309090b%22,%22icons%22:[{%22src%22:%22data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='20'%20fill='%2318181b'/%3E%3Cpath%20d='M50%2020%20L80%2050%20L50%2080%20L20%2050%20Z'%20fill='%23eccc68'/%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]}">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Yapp%20by%20Caviar%20Studios%22,%22short_name%22:%22Yapp%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%2309090b%22,%22theme_color%22:%22%2309090b%22,%22icons%22:[{%22src%22:%22data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='20'%20fill='%2318181b'/%3E%3Cpath%20d='M50%2020%20L80%2050%20L50%2080%20L20%2050%20Z'%20fill='%23eccc68'/%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22},{%22src%22:%22data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='20'%20fill='%2318181b'/%3E%3Cpath%20d='M50%2020%20L80%2050%20L50%2080%20L20%2050%20Z'%20fill='%23eccc68'/%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22}]}">
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -131,7 +128,6 @@
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
     <div class="auth-card" id="auth-screen">
         <h2>Welcome to Yapp</h2>
         <p>Stop talking, start yapping.</p>
@@ -165,10 +161,8 @@
         <button class="btn" id="login-btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
-    <!-- MAIN APP SCREEN -->
     <div class="app-container hidden" id="app-screen">
         
-        <!-- DESKTOP SIDEBAR -->
         <div class="sidebar">
             <div class="current-user-tag" id="user-profile-summary" style="cursor: pointer;" title="Click to Logout" onclick="handleSystemLogout()"></div>
             <div class="channels">
@@ -194,10 +188,8 @@
             <div class="brand-footer">BY CAVIAR STUDIOS © 2026</div>
         </div>
 
-        <!-- MAIN CHAT INTERFACE -->
         <div class="chat-main">
             
-            <!-- 📊 SECURED ADMIN METRICS & USER OVERLAY VAULT -->
             <div class="admin-dashboard-view" id="admin-panel-root-view">
                 <div class="modal-header">
                     <h2 style="font-size:1.3rem; font-weight:800; color:white; letter-spacing:-0.5px;">👑 Caviar Studios Server Core</h2>
@@ -210,7 +202,6 @@
                     <div class="metric-card"><h3>Active Channels</h3><div class="metric-value" id="metric-rooms">0</div></div>
                 </div>
 
-                <!-- Dynamic Registered Account Directory Table Framework -->
                 <div class="directory-wrap">
                     <h3 style="font-size: 1rem; font-weight: 700; color: white;">📋 Live Account Database</h3>
                     <div class="directory-table-container">
@@ -224,14 +215,12 @@
                                 </tr>
                             </thead>
                             <tbody id="admin-directory-rows-root">
-                                <!-- Users rows populate natively here -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- 📱 MOBILE NAVIGATION DRAWER -->
             <div class="mobile-modal" id="chats-overlay-modal">
                 <div class="modal-header">
                     <h3 id="mobile-modal-title-logout" style="font-size: 1.1rem; font-weight: bold; cursor: pointer; color: #71717a;" onclick="handleSystemLogout()">Logout 🚪</h3>
