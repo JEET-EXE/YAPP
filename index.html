@@ -86,7 +86,6 @@
 
         /* Input Bar */
         .input-container { padding: 16px; background: #0f0f11; }
-        /* 🛠️ FIXED LAYOUT: Re-injected layout display engines to force input row alignment */
         .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; align-items: center; width: 100%; }
         .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; width: 100%; }
         .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; height: 100%; }
@@ -282,7 +281,10 @@
     let activeDms = []; 
     let selectedProfileColor = '#ff4757'; 
 
-    window.addEventListener('DOMContentLoaded', () => { checkSavedUserSession(); });
+    // 🛠️ BUGFIX: Delay initialization until the system fully triggers DOM structures
+    window.addEventListener('DOMContentLoaded', () => { 
+        setTimeout(checkSavedUserSession, 100); 
+    });
 
     function showError(text) {
         const errBox = document.getElementById('error-message');
@@ -302,21 +304,35 @@
         const savedSession = localStorage.getItem('yapp_cached_user');
         if (savedSession) {
             try {
-                currentUser = JSON.parse(savedSession);
-                initializeMainApplicationView();
+                const parsed = JSON.parse(savedSession);
+                // 🛠️ BUGFIX: Enforce structural safety properties on storage extraction
+                if (parsed && parsed.username && parsed.tag) {
+                    currentUser = {
+                        username: parsed.username,
+                        tag: parsed.tag,
+                        color: parsed.color || '#3f3f46',
+                        fullTag: parsed.fullTag || `${parsed.username}${parsed.tag}`
+                    };
+                    initializeMainApplicationView();
+                } else {
+                    localStorage.removeItem('yapp_cached_user');
+                }
             } catch (e) {
+                console.error("Cache reconstruction failure:", e);
                 localStorage.removeItem('yapp_cached_user');
             }
         }
     }
 
     async function initializeMainApplicationView() {
+        if (!currentUser) return;
+
         document.getElementById('user-profile-summary').innerHTML = `
             <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
             <div>${currentUser.username}<span>${currentUser.tag}</span></div>
         `;
         const mobTitle = document.getElementById('mobile-modal-title-logout');
-        if (mobTitle) mobTitle.innerText = `${currentUser.username}${currentUser.tag} (Logout 🚪)`;
+        if (mobTitle) mobTitle.innerText = `${currentUser.fullTag} (Logout 🚪)`;
 
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('app-screen').classList.remove('hidden');
@@ -446,6 +462,7 @@
     }
 
     async function autoDiscoverRooms() {
+        if (!currentUser) return;
         try {
             const { data, error } = await supabaseClient.from('messages').select('room').not('room', 'is', null).not('room', 'eq', 'global');
             if (error) throw error;
@@ -479,7 +496,7 @@
         const crewTitle = nameInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
         const rawTags = tagsInput.value.trim().toLowerCase();
 
-        if(!crewTitle || !rawTags) return;
+        if(!crewTitle || !rawTags || !currentUser) return;
 
         let memberList = rawTags.split(',').map(t => t.trim()).filter(Boolean);
         memberList.push(currentUser.fullTag.toLowerCase());
@@ -503,6 +520,7 @@
     function handleDmTargetKey(e) { if(e.key === 'Enter') triggerMobileDmSubmit(false); }
 
     function triggerMobileDmSubmit(isFromMobileModal = false) {
+        if (!currentUser) return;
         const inputId = isFromMobileModal ? 'mobile-dm-target-input' : 'dm-target-input';
         const targetInput = document.getElementById(inputId);
         const targetUser = targetInput.value.trim();
@@ -597,6 +615,7 @@
     }
 
     async function dispatchMessage() {
+        if (!currentUser) return;
         const input = document.getElementById('chat-raw-input');
         const text = input.value.trim(); if(!text) return;
 
