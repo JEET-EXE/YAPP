@@ -7,8 +7,6 @@
     
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
 
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
-
     <script>
         const manifestContent = {
             "name": "Yapp by Caviar Studios",
@@ -132,7 +130,7 @@
         .metric-card { background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; text-align: center; }
         .metric-value { font-size: 2.2rem; font-weight: 800; color: #eccc68; margin-top: 8px; }
 
-        /* Dynamic Registered Account Directory Table Framework */
+        /* User directory layout styles */
         .directory-wrap { flex: 1; background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; min-height: 250px; }
         .directory-table-container { flex: 1; overflow-y: auto; margin-top: 12px; }
         .directory-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
@@ -365,7 +363,8 @@
         loginBtn.innerText = "Checking..."; loginBtn.disabled = true;
 
         try {
-            const { data: userExists, error: fetchError } = await supabaseClient
+            // ✨ SECURED: Query database for the exact unique combo of BOTH username AND tag
+            const { data: accountRow, error: fetchError } = await supabaseClient
                 .from('users')
                 .select('*')
                 .eq('username', username)
@@ -374,20 +373,23 @@
 
             if (fetchError) throw fetchError;
 
-            if (userExists) {
-                if (userExists.password !== pass) {
+            if (accountRow) {
+                // If account exists, perform strict standard login authentication pass check
+                if (accountRow.password !== pass) {
                     showError('❌ Wrong password for this account, bro!');
                     loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
                     return;
                 }
-                currentUser = { username: userExists.username, tag: userExists.tag, color: userExists.color, fullTag: `${userExists.username}${userExists.tag}` };
+                currentUser = { username: accountRow.username, tag: accountRow.tag, color: accountRow.color, fullTag: `${accountRow.username}${accountRow.tag}` };
             } else {
-                const { data: nameCheck } = await supabaseClient.from('users').select('username').eq('username', username).maybeSingle();
-                if (nameCheck) {
-                    showError('❌ Username taken! Try another one.');
+                // ✨ HARD LOCK SECURITY VALVE: Instantly deny any random registrations trying to hijack the 'admin' mantle
+                if (username.toLowerCase() === 'admin') {
+                    showError('🚨 Nice try, bro. You can\'t register a new Admin account!');
                     loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
                     return;
                 }
+
+                // If combination doesn't exist, create it cleanly! Completely safe from collision blocks!
                 const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color }]);
                 if (insertError) throw insertError;
                 currentUser = { username, tag, color, fullTag: `${username}${tag}` };
@@ -396,8 +398,7 @@
             localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
             initializeMainApplicationView();
         } catch (err) {
-            if (err.message && err.message.includes('unique constraint')) showError('❌ Username registered already.');
-            else showError('Database error: ' + err.message);
+            showError('Database error: ' + err.message);
             loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
         }
     }
