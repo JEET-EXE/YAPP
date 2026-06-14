@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yapp by Caviar Studios</title>
     
+    <!-- 💎 MAGIC AUTO-GENERATED CAVIAR STUDIOS GOLD DIAMOND ICON -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2318181b'/%3E%3Cpath d='M50 20 L80 50 L50 80 L20 50 Z' fill='%23eccc68'/%3E%3C/svg%3E">
 
     <style>
@@ -91,16 +92,23 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 10px; }
         .close-modal-btn { background: #27272a; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
 
-        /* 📱 NEW: Sleek layout frames for mobile side forms button clusters */
         .mobile-inline-form-row { display: flex; gap: 6px; margin-top: 4px; width: 100%; }
         .mobile-inline-form-row input { flex: 1; }
         .mobile-inline-form-row button { background: #f4f4f5; color: #09090b; border: none; border-radius: 6px; padding: 0 16px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
 
         /* 📊 ADMIN METRICS VIEW OVERLAY MODULE */
-        .admin-dashboard-view { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0c0c0e; z-index: 1000; flex-direction: column; padding: 25px; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; }
+        .admin-dashboard-view { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0c0c0e; z-index: 1000; flex-direction: column; padding: 25px; overflow-y: auto; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; margin-bottom: 24px; }
         .metric-card { background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; text-align: center; }
         .metric-value { font-size: 2.2rem; font-weight: 800; color: #eccc68; margin-top: 8px; }
+
+        /* ✨ NEW: User directory layout styles */
+        .directory-wrap { flex: 1; background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; min-height: 250px; }
+        .directory-table-container { flex: 1; overflow-y: auto; margin-top: 12px; }
+        .directory-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        .directory-table th, .directory-table td { padding: 12px; border-bottom: 1px solid #222226; }
+        .directory-table th { color: #a1a1aa; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        .directory-table td { color: #e4e4e7; }
 
         /* 📱 MOBILE NAVIGATION BAR */
         .mobile-nav-bar { display: none; background: #18181b; border-top: 1px solid #27272a; height: 65px; min-height: 65px; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
@@ -117,6 +125,7 @@
 </head>
 <body>
 
+    <!-- LOGIN SCREEN -->
     <div class="auth-card" id="auth-screen">
         <h2>Welcome to Yapp</h2>
         <p>Stop talking, start yapping.</p>
@@ -150,8 +159,10 @@
         <button class="btn" id="login-btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
+    <!-- MAIN APP SCREEN -->
     <div class="app-container hidden" id="app-screen">
         
+        <!-- DESKTOP SIDEBAR -->
         <div class="sidebar">
             <div class="current-user-tag" id="user-profile-summary" style="cursor: pointer;" title="Click to Logout" onclick="handleSystemLogout()"></div>
             <div class="channels">
@@ -177,20 +188,44 @@
             <div class="brand-footer">BY CAVIAR STUDIOS © 2026</div>
         </div>
 
+        <!-- MAIN CHAT INTERFACE -->
         <div class="chat-main">
             
+            <!-- 📊 SECURED ADMIN METRICS & USER OVERLAY VAULT -->
             <div class="admin-dashboard-view" id="admin-panel-root-view">
                 <div class="modal-header">
-                    <h2 style="font-size:1.3rem; font-weight:800; color:white; letter-spacing:-0.5px;">👑 Caviar Studios Analytics</h2>
-                    <button class="close-modal-btn" style="background:#ef4444;" onclick="toggleAdminPanelOverlay(false)">Exit Panel</button>
+                    <h2 style="font-size:1.3rem; font-weight:800; color:white; letter-spacing:-0.5px;">👑 Caviar Studios Server Core</h2>
+                    <button class="close-modal-btn" style="background:#ef4444;" onclick="toggleAdminPanelOverlay(false)">Exit Vault</button>
                 </div>
+                
                 <div class="metrics-grid">
                     <div class="metric-card"><h3>Registered Yappers</h3><div class="metric-value" id="metric-users">0</div></div>
-                    <div class="metric-card"><h3>Total Global & DM Rows</h3><div class="metric-value" id="metric-messages">0</div></div>
+                    <div class="metric-card"><h3>Total Message Rows</h3><div class="metric-value" id="metric-messages">0</div></div>
                     <div class="metric-card"><h3>Active Channels</h3><div class="metric-value" id="metric-rooms">0</div></div>
+                </div>
+
+                <!-- ✨ NEW: Dynamic Registered Account Directory Table Framework -->
+                <div class="directory-wrap">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: white;">📋 Live Account Database</h3>
+                    <div class="directory-table-container">
+                        <table class="directory-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Tag</th>
+                                    <th>Password</th>
+                                    <th>Color Hex</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-directory-rows-root">
+                                <!-- Users rows populate natively here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
+            <!-- 📱 MOBILE NAVIGATION DRAWER -->
             <div class="mobile-modal" id="chats-overlay-modal">
                 <div class="modal-header">
                     <h3 id="mobile-modal-title-logout" style="font-size: 1.1rem; font-weight: bold; cursor: pointer; color: #71717a;" onclick="handleSystemLogout()">Logout 🚪</h3>
@@ -363,22 +398,43 @@
         }
     }
 
+    // ✨ UPDATED: ADMIN PANEL INJECTS ENTIRE ACCOUNT DIRECTORY RECORDSET
     async function toggleAdminPanelOverlay(show) {
         const panel = document.getElementById('admin-panel-root-view');
         if(!show) { panel.style.display = 'none'; return; }
         
         panel.style.display = 'flex';
         try {
-            const { count: usersCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+            // Fetch total count values
+            const { data: allUsers, error: usersErr } = await supabaseClient.from('users').select('*').order('username', { ascending: true });
             const { count: msgCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true });
             const { data: uniqueRooms } = await supabaseClient.from('messages').select('room');
+            
+            if(usersErr) throw usersErr;
+
             const roomSet = new Set((uniqueRooms || []).map(m => m.room).filter(Boolean));
 
-            document.getElementById('metric-users').innerText = usersCount || 0;
+            document.getElementById('metric-users').innerText = allUsers ? allUsers.length : 0;
             document.getElementById('metric-messages').innerText = msgCount || 0;
             document.getElementById('metric-rooms').innerText = roomSet.size || 1;
+
+            // Render live database user objects row by row
+            const rowsContainer = document.getElementById('admin-directory-rows-root');
+            rowsContainer.innerHTML = '';
+
+            (allUsers || []).forEach(account => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:600; color:#fff;">${account.username || 'N/A'}</td>
+                    <td style="color:#a1a1aa;">${account.tag || 'N/A'}</td>
+                    <td style="font-family:monospace; color:#eccc68;">${account.password || '••••'}</td>
+                    <td><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${account.color || '#fff'}; margin-right:6px;"></span>${account.color || '#fff'}</td>
+                `;
+                rowsContainer.appendChild(tr);
+            });
+
         } catch(e) {
-            console.error(e);
+            console.error("Database user tracking core diagnostic failure:", e);
         }
     }
 
