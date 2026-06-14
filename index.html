@@ -30,8 +30,15 @@
         .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
         .form-row { display: flex; gap: 10px; }
         label { font-size: 0.8rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: all 0.2s ease; }
-        input:focus, select:focus { border-color: #a1a1aa; background: #2e2e33; }
+        input { background: #27272a; border: 1px solid #3f3f46; padding: 10px 12px; border-radius: 6px; color: white; font-size: 0.95rem; outline: none; transition: all 0.2s ease; }
+        input:focus { border-color: #a1a1aa; background: #2e2e33; }
+        
+        /* ✨ NEW: Interactive grid selector system for profile layout rings */
+        .color-palette-grid { display: flex; gap: 10px; justify-content: center; padding: 8px 0; margin-bottom: 4px; }
+        .palette-node { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .palette-node:hover { transform: scale(1.1); }
+        .palette-node.selected { border-color: #ffffff; transform: scale(1.15); box-shadow: 0 0 12px rgba(255, 255, 255, 0.3); }
+
         .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; margin-top: 10px; width: 100%; transition: all 0.2s ease; }
         .btn:hover { background: #e4e4e7; transform: translateY(-1px); }
         
@@ -79,13 +86,6 @@
         .msg-delete-btn:hover { background: #3f3f46; color: #ef4444; }
         .msg-text { font-size: 0.95rem; color: #e4e4e7; word-break: break-word; }
 
-        /* Input Bar */
-        .input-container { padding: 16px; background: #0f0f11; }
-        .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; }
-        .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; }
-        .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
-        .input-wrapper button:hover { color: #f4f4f5; }
-
         /* 📱 MOBILE MODAL OVERLAY FOR NAVIGATION DECK */
         .mobile-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 999; flex-direction: column; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
         .mobile-modal.slide-active { display: flex; animation: slideUpModal 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
@@ -102,7 +102,6 @@
         .metric-card { background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; text-align: center; }
         .metric-value { font-size: 2.2rem; font-weight: 800; color: #eccc68; margin-top: 8px; }
 
-        /* ✨ NEW: User directory layout styles */
         .directory-wrap { flex: 1; background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; min-height: 250px; }
         .directory-table-container { flex: 1; overflow-y: auto; margin-top: 12px; }
         .directory-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
@@ -144,18 +143,21 @@
             <label>Password</label>
             <input type="password" id="reg-pass" placeholder="••••••••">
         </div>
+        
+        <!-- ✨ NEW: Beautiful Circle Color Palette Grid Interface (Replaced Mid Dropdown) -->
         <div class="form-group">
-            <label>Profile Color</label>
-            <select id="reg-color">
-                <option value="#ff4757">🔥 Red</option>
-                <option value="#ffa502">🍊 Orange</option>
-                <option value="#eccc68">☀️ Yellow</option>
-                <option value="#2ed573">🌿 Green</option>
-                <option value="#1e90ff">💧 Blue</option>
-                <option value="#3742fa">🪻 Indigo</option>
-                <option value="#8e44ad">🍇 Violet</option>
-            </select>
+            <label>Choose Profile Color</label>
+            <div class="color-palette-grid">
+                <div class="palette-node selected" style="background: #ff4757;" onclick="selectPaletteColor('#ff4757', this)"></div>
+                <div class="palette-node" style="background: #ffa502;" onclick="selectPaletteColor('#ffa502', this)"></div>
+                <div class="palette-node" style="background: #eccc68;" onclick="selectPaletteColor('#eccc68', this)"></div>
+                <div class="palette-node" style="background: #2ed573;" onclick="selectPaletteColor('#2ed573', this)"></div>
+                <div class="palette-node" style="background: #1e90ff;" onclick="selectPaletteColor('#1e90ff', this)"></div>
+                <div class="palette-node" style="background: #3742fa;" onclick="selectPaletteColor('#3742fa', this)"></div>
+                <div class="palette-node" style="background: #8e44ad;" onclick="selectPaletteColor('#8e44ad', this)"></div>
+            </div>
         </div>
+        
         <button class="btn" id="login-btn" onclick="handleLogin()">Login / Register</button>
     </div>
 
@@ -204,7 +206,6 @@
                     <div class="metric-card"><h3>Active Channels</h3><div class="metric-value" id="metric-rooms">0</div></div>
                 </div>
 
-                <!-- ✨ NEW: Dynamic Registered Account Directory Table Framework -->
                 <div class="directory-wrap">
                     <h3 style="font-size: 1rem; font-weight: 700; color: white;">📋 Live Account Database</h3>
                     <div class="directory-table-container">
@@ -217,9 +218,7 @@
                                     <th>Color Hex</th>
                                 </tr>
                             </thead>
-                            <tbody id="admin-directory-rows-root">
-                                <!-- Users rows populate natively here -->
-                            </tbody>
+                            <tbody id="admin-directory-rows-root"></tbody>
                         </table>
                     </div>
                 </div>
@@ -282,6 +281,9 @@
     let currentUser = null; 
     let currentTab = 'global'; 
     let activeDms = []; 
+    
+    // ✨ Global tracking variable for selected grid value defaults to Red
+    let selectedProfileColor = '#ff4757'; 
 
     window.addEventListener('DOMContentLoaded', () => { checkSavedUserSession(); });
 
@@ -292,6 +294,16 @@
     }
 
     function clearError() { document.getElementById('error-message').style.display = 'none'; }
+
+    // ✨ NEW: Handles smooth layout tracking changes inside registration menu grid loops
+    function selectPaletteColor(colorHex, elementNode) {
+        selectedProfileColor = colorHex;
+        
+        // Wipe active border flags off nodes
+        document.querySelectorAll('.palette-node').forEach(node => node.classList.remove('selected'));
+        // Light up the chosen aesthetic circle
+        elementNode.classList.add('selected');
+    }
 
     function checkSavedUserSession() {
         const savedSession = localStorage.getItem('yapp_cached_user');
@@ -333,7 +345,6 @@
         const username = document.getElementById('reg-user').value.trim();
         let tag = document.getElementById('reg-tag').value.trim();
         const pass = document.getElementById('reg-pass').value;
-        const color = document.getElementById('reg-color').value;
 
         if(!username || !pass) { showError('Fill in your details, bro!'); return; }
         if(!tag.startsWith('#')) { tag = '#' + tag; }
@@ -366,9 +377,10 @@
                     loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
                     return;
                 }
-                const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color }]);
+                // ✨ Injects the interactive selected Profile Color grid value seamlessly
+                const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color: selectedProfileColor }]);
                 if (insertError) throw insertError;
-                currentUser = { username, tag, color, fullTag: `${username}${tag}` };
+                currentUser = { username, tag, color: selectedProfileColor, fullTag: `${username}${tag}` };
             }
 
             localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
@@ -398,14 +410,12 @@
         }
     }
 
-    // ✨ UPDATED: ADMIN PANEL INJECTS ENTIRE ACCOUNT DIRECTORY RECORDSET
     async function toggleAdminPanelOverlay(show) {
         const panel = document.getElementById('admin-panel-root-view');
         if(!show) { panel.style.display = 'none'; return; }
         
         panel.style.display = 'flex';
         try {
-            // Fetch total count values
             const { data: allUsers, error: usersErr } = await supabaseClient.from('users').select('*').order('username', { ascending: true });
             const { count: msgCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true });
             const { data: uniqueRooms } = await supabaseClient.from('messages').select('room');
@@ -418,7 +428,6 @@
             document.getElementById('metric-messages').innerText = msgCount || 0;
             document.getElementById('metric-rooms').innerText = roomSet.size || 1;
 
-            // Render live database user objects row by row
             const rowsContainer = document.getElementById('admin-directory-rows-root');
             rowsContainer.innerHTML = '';
 
@@ -432,10 +441,7 @@
                 `;
                 rowsContainer.appendChild(tr);
             });
-
-        } catch(e) {
-            console.error("Database user tracking core diagnostic failure:", e);
-        }
+        } catch(e) { console.error(e); }
     }
 
     async function nukeGlobalChatLog() {
