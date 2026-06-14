@@ -17,19 +17,10 @@
         .hidden { display: none !important; }
         .pfp-circle { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: white; text-transform: uppercase; }
 
-        /* ✨ ANIMATION KEYFRAMES */
-        @keyframes popUp {
-            0% { transform: scale(0.95); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes msgSlide {
-            0% { transform: translateY(8px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes slideUpModal {
-            0% { transform: translateY(100%); }
-            100% { transform: translateY(0); }
-        }
+        /* ANIMATION KEYFRAMES */
+        @keyframes popUp { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes msgSlide { 0% { transform: translateY(8px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes slideUpModal { 0% { transform: translateY(100%); } 100% { transform: translateY(0); } }
 
         /* Login Screen */
         .auth-card { background: #18181b; padding: 30px; border-radius: 12px; width: 100%; max-width: 380px; border: 1px solid #27272a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: popUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -42,9 +33,7 @@
         input:focus, select:focus { border-color: #a1a1aa; background: #2e2e33; }
         .btn { background: #f4f4f5; color: #09090b; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; margin-top: 10px; width: 100%; transition: all 0.2s ease; }
         .btn:hover { background: #e4e4e7; transform: translateY(-1px); }
-        .btn:active { transform: translateY(0); }
         
-        /* Error Alert Message Styling */
         .error-banner { background: #ef4444; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; display: none; font-weight: 500; animation: popUp 0.2s ease-out; }
 
         /* Main Layout */
@@ -63,15 +52,14 @@
         .chan-btn:active { transform: scale(0.98); }
         .chan-left { display: flex; align-items: center; gap: 8px; min-width: 0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
         
-        /* Delete Button Hover Action */
         .nuke-room-trigger { color: #71717a; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; transition: all 0.15s ease; font-weight: bold; }
         .nuke-room-trigger:hover { background: #ef4444; color: white; transform: scale(1.1); }
 
-        /* DM Creator Form inside Sidebar */
-        .dm-start { padding: 12px; border-top: 1px solid #27272a; display: flex; flex-direction: column; gap: 8px; background: #18181b; }
-        .dm-start input { padding: 6px 8px; font-size: 0.8rem; }
+        /* Multi-Functional Side Forms */
+        .sidebar-forms-deck { padding: 12px; border-top: 1px solid #27272a; display: flex; flex-direction: column; gap: 12px; background: #18181b; }
+        .sidebar-forms-deck label { font-size: 0.75rem; }
+        .sidebar-forms-deck input { padding: 6px 8px; font-size: 0.8rem; }
 
-        /* Brand Footer Styling */
         .brand-footer { padding: 10px 16px; font-size: 0.7rem; color: #3f3f46; border-top: 1px solid #27272a; background: #141416; text-align: center; letter-spacing: 0.5px; font-weight: 500; }
 
         /* Chat Area */
@@ -86,39 +74,39 @@
         .msg-meta .tag { color: #71717a; font-weight: normal; font-size: 0.75rem; }
         .msg-meta .time { color: #52525b; font-weight: normal; font-size: 0.75rem; }
         
-        /* Surgical message delete trigger style */
         .msg-delete-btn { color: #71717a; font-size: 0.7rem; cursor: pointer; border: none; background: transparent; padding: 2px 6px; border-radius: 4px; transition: all 0.15s ease; font-weight: bold; margin-left: auto; }
         .msg-delete-btn:hover { background: #3f3f46; color: #ef4444; }
-        
         .msg-text { font-size: 0.95rem; color: #e4e4e7; word-break: break-word; }
 
         /* Input Bar */
         .input-container { padding: 16px; background: #0f0f11; }
-        .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; transition: border-color 0.2s; }
-        .input-wrapper:focus-within { border-color: #52525b; }
+        .input-wrapper { display: flex; background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 4px; }
         .input-wrapper input { flex: 1; background: transparent; border: none; padding: 10px; color: white; outline: none; }
-        .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; transition: color 0.2s; }
+        .input-wrapper button { background: transparent; border: none; color: #a1a1aa; padding: 0 15px; cursor: pointer; font-weight: 600; }
         .input-wrapper button:hover { color: #f4f4f5; }
+
+        /* 📱 MOBILE MODAL OVERLAY FOR NAVIGATION DECK */
+        .mobile-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 999; flex-direction: column; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+        .mobile-modal.slide-active { display: flex; animation: slideUpModal 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 10px; }
+        .close-modal-btn { background: #27272a; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+
+        /* 📊 ADMIN METRICS VIEW OVERLAY MODULE */
+        .admin-dashboard-view { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0c0c0e; z-index: 1000; flex-direction: column; padding: 25px; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; }
+        .metric-card { background: #141416; border: 1px solid #222226; border-radius: 10px; padding: 20px; text-align: center; }
+        .metric-value { font-size: 2.2rem; font-weight: 800; color: #eccc68; margin-top: 8px; }
 
         /* 📱 MOBILE NAVIGATION BAR */
         .mobile-nav-bar { display: none; background: #18181b; border-top: 1px solid #27272a; height: 65px; min-height: 65px; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { color: #a1a1aa; font-size: 0.9rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; width: 50%; height: 100%; justify-content: center; transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; }
         .nav-item.active { color: #f4f4f5; background: #27272a; }
 
-        /* 📱 MOBILE MODAL OVERLAY FOR CHATS */
-        .mobile-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 999; flex-direction: column; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
-        .mobile-modal.slide-active { display: flex; animation: slideUpModal 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #27272a; padding-bottom: 10px; }
-        .close-modal-btn { background: #27272a; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
-
-        /* 📱 RESPONSIVE SCALING FRAMEWORK */
         @media (max-width: 768px) {
             .app-container { width: 100vw; max-width: 100vw; height: 100%; max-height: 100%; border-radius: 0; border: none; display: flex; flex-direction: column; }
             .sidebar { display: none !important; } 
             .chat-main { flex: 1; display: flex; flex-direction: column; height: 0; min-height: 0; overflow: hidden; }
             .mobile-nav-bar { display: flex; }
-            .messages-pane { padding: 16px; gap: 12px; }
-            .input-container { padding: 12px; }
         }
     </style>
 </head>
@@ -165,23 +153,39 @@
                 <div class="chan-btn active" id="global-chan-btn" onclick="switchTab('global', '🌍 global-yapp')">
                     <div class="chan-left">🌍 global-yapp</div>
                 </div>
-                <div style="font-size: 0.75rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; margin: 15px 0 5px 10px; font-weight: bold;">Direct Messages</div>
+                <div style="font-size: 0.75rem; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; margin: 15px 0 5px 10px; font-weight: bold;">Rooms & Channels</div>
                 <div id="dm-list-container" style="display:flex; flex-direction:column; gap:4px;"></div>
             </div>
-            <div class="dm-start">
-                <label>Start Private DM</label>
-                <div style="display: flex; gap: 4px; width: 100%;">
-                    <input type="text" id="dm-target-input" placeholder="User#12345 + Enter" onkeypress="handleDmTargetKey(event)" style="flex: 1;">
-                    <button onclick="triggerMobileDmSubmit(false)" style="background: #27272a; color: white; border: 1px solid #3f3f46; border-radius: 6px; padding: 0 10px; cursor: pointer; font-size: 0.8rem;">Go</button>
+            
+            <div class="sidebar-forms-deck">
+                <div>
+                    <label>Start Private 1v1 DM</label>
+                    <input type="text" id="dm-target-input" placeholder="User#12345 + Enter" onkeypress="handleDmTargetKey(event)" style="width:100%; margin-top:4px;">
                 </div>
+                <div>
+                    <label>Build a Group Crew</label>
+                    <input type="text" id="group-name-input" placeholder="Crew Name" style="width:100%; margin-top:4px; margin-bottom:4px;">
+                    <input type="text" id="group-tags-input" placeholder="UserA#12,UserB#34 + Enter" onkeypress="if(event.key==='Enter') createGroupCrewChannel(false)" style="width:100%;">
+                </div>
+                <div id="desktop-admin-panel-trigger-slot"></div>
             </div>
-            <div class="brand-footer">
-                BY CAVIAR STUDIOS © 2026
-            </div>
+            <div class="brand-footer">BY CAVIAR STUDIOS © 2026</div>
         </div>
 
         <div class="chat-main">
             
+            <div class="admin-dashboard-view" id="admin-panel-root-view">
+                <div class="modal-header">
+                    <h2 style="font-size:1.3rem; font-weight:800; color:white; letter-spacing:-0.5px;">👑 Caviar Studios Analytics</h2>
+                    <button class="close-modal-btn" style="background:#ef4444;" onclick="toggleAdminPanelOverlay(false)">Exit Panel</button>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-card"><h3>Registered Yappers</h3><div class="metric-value" id="metric-users">0</div></div>
+                    <div class="metric-card"><h3>Total Global & DM Rows</h3><div class="metric-value" id="metric-messages">0</div></div>
+                    <div class="metric-card"><h3>Active Channels</h3><div class="metric-value" id="metric-rooms">0</div></div>
+                </div>
+            </div>
+
             <div class="mobile-modal" id="chats-overlay-modal">
                 <div class="modal-header">
                     <h3 id="mobile-modal-title-logout" style="font-size: 1.1rem; font-weight: bold; cursor: pointer; color: #71717a;" onclick="handleSystemLogout()">Logout 🚪</h3>
@@ -189,12 +193,17 @@
                 </div>
                 <div id="mobile-dm-list-container" style="display:flex; flex-direction:column; gap:10px; flex: 1; overflow-y: auto; margin-bottom: 20px;"></div>
                 
-                <div style="background: #18181b; padding: 15px; border-radius: 8px; border: 1px solid #27272a;">
-                    <label style="display:block; margin-bottom: 8px;">Start Private DM</label>
-                    <div style="display: flex; gap: 6px; width: 100%;">
-                        <input type="text" id="mobile-dm-target-input" placeholder="User#12345" style="flex: 1; padding: 12px;" onkeypress="if(event.key==='Enter') triggerMobileDmSubmit(true)">
-                        <button onclick="triggerMobileDmSubmit(true)" style="background: #f4f4f5; color: #09090b; border: none; border-radius: 6px; padding: 0 20px; font-weight: bold; cursor: pointer;">Go</button>
+                <div style="background: #18181b; padding: 15px; border-radius: 8px; border: 1px solid #27272a; display:flex; flex-direction:column; gap:12px;">
+                    <div>
+                        <label>Start 1v1 DM</label>
+                        <input type="text" id="mobile-dm-target-input" placeholder="User#12345" style="width: 100%; padding: 10px; margin-top:4px;" onkeypress="if(event.key==='Enter') triggerMobileDmSubmit(true)">
                     </div>
+                    <div style="border-top:1px solid #27272a; padding-top:10px;">
+                        <label>Build a Group Crew</label>
+                        <input type="text" id="mob-group-name-input" placeholder="Crew Name" style="width: 100%; padding: 10px; margin-top:4px; margin-bottom:4px;">
+                        <input type="text" id="mob-group-tags-input" placeholder="UserA#12,UserB#34" style="width: 100%; padding: 10px;" onkeypress="if(event.key==='Enter') createGroupCrewChannel(true)">
+                    </div>
+                    <div id="mobile-admin-panel-trigger-slot"></div>
                 </div>
             </div>
 
@@ -211,14 +220,8 @@
             </div>
 
             <div class="mobile-nav-bar">
-                <div class="nav-item active" id="mobile-nav-global" onclick="handleMobileNavClick('global')">
-                    <span>🌍</span>
-                    <span>Global</span>
-                </div>
-                <div class="nav-item" id="mobile-nav-chats" onclick="handleMobileNavClick('chats')">
-                    <span>💬</span>
-                    <span>Chats</span>
-                </div>
+                <div class="nav-item active" id="mobile-nav-global" onclick="handleMobileNavClick('global')"><span>🌍</span><span>Global</span></div>
+                <div class="nav-item" id="mobile-nav-chats" onclick="handleMobileNavClick('chats')"><span>💬</span><span>Channels</span></div>
             </div>
 
         </div>
@@ -234,9 +237,7 @@
     let currentTab = 'global'; 
     let activeDms = []; 
 
-    window.addEventListener('DOMContentLoaded', () => {
-        checkSavedUserSession();
-    });
+    window.addEventListener('DOMContentLoaded', () => { checkSavedUserSession(); });
 
     function showError(text) {
         const errBox = document.getElementById('error-message');
@@ -244,9 +245,7 @@
         errBox.style.display = 'block';
     }
 
-    function clearError() {
-        document.getElementById('error-message').style.display = 'none';
-    }
+    function clearError() { document.getElementById('error-message').style.display = 'none'; }
 
     function checkSavedUserSession() {
         const savedSession = localStorage.getItem('yapp_cached_user');
@@ -255,7 +254,6 @@
                 currentUser = JSON.parse(savedSession);
                 initializeMainApplicationView();
             } catch (e) {
-                console.error("Failed to recover user cache session layers:", e);
                 localStorage.removeItem('yapp_cached_user');
             }
         }
@@ -266,7 +264,6 @@
             <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
             <div>${currentUser.username}<span>${currentUser.tag}</span></div>
         `;
-        
         const mobTitle = document.getElementById('mobile-modal-title-logout');
         if (mobTitle) mobTitle.innerText = `${currentUser.username}${currentUser.tag} (Logout 🚪)`;
 
@@ -280,9 +277,7 @@
     }
 
     function handleSystemLogout() {
-        const logoutConfirm = confirm("Do you want to log out of your Yapp session, bro?");
-        if (!logoutConfirm) return;
-        
+        if (!confirm("Do you want to log out, bro?")) return;
         localStorage.removeItem('yapp_cached_user');
         window.location.reload(); 
     }
@@ -299,8 +294,7 @@
         if(tag.length < 2) { tag = '#12345'; }
 
         const loginBtn = document.getElementById('login-btn');
-        loginBtn.innerText = "Checking...";
-        loginBtn.disabled = true;
+        loginBtn.innerText = "Checking..."; loginBtn.disabled = true;
 
         try {
             const { data: userExists, error: fetchError } = await supabaseClient
@@ -315,100 +309,83 @@
             if (userExists) {
                 if (userExists.password !== pass) {
                     showError('❌ Wrong password for this account, bro!');
-                    loginBtn.innerText = "Login / Register";
-                    loginBtn.disabled = false;
+                    loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
                     return;
                 }
-                currentUser = { 
-                    username: userExists.username, 
-                    tag: userExists.tag, 
-                    color: userExists.color, 
-                    fullTag: `${userExists.username}${userExists.tag}` 
-                };
+                currentUser = { username: userExists.username, tag: userExists.tag, color: userExists.color, fullTag: `${userExists.username}${userExists.tag}` };
             } else {
-                const { data: nameCheck } = await supabaseClient
-                    .from('users')
-                    .select('username')
-                    .eq('username', username)
-                    .maybeSingle();
-
+                const { data: nameCheck } = await supabaseClient.from('users').select('username').eq('username', username).maybeSingle();
                 if (nameCheck) {
-                    showError('❌ That username is already taken! Try another one, bro.');
-                    loginBtn.innerText = "Login / Register";
-                    loginBtn.disabled = false;
+                    showError('❌ Username taken! Try another one.');
+                    loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
                     return;
                 }
-
-                const { error: insertError } = await supabaseClient
-                    .from('users')
-                    .insert([{ username, password: pass, tag, color }]);
-
+                const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color }]);
                 if (insertError) throw insertError;
-
                 currentUser = { username, tag, color, fullTag: `${username}${tag}` };
             }
 
             localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
             initializeMainApplicationView();
-
         } catch (err) {
-            console.error(err);
-            if (err.message && err.message.includes('unique constraint')) {
-                showError('❌ That username is already registered. Try a different one!');
-            } else {
-                showError('Database error: ' + (err.message || 'Check your connections.'));
-            }
-            loginBtn.innerText = "Login / Register";
-            loginBtn.disabled = false;
+            if (err.message && err.message.includes('unique constraint')) showError('❌ Username registered already.');
+            else showError('Database error: ' + err.message);
+            loginBtn.innerText = "Login / Register"; loginBtn.disabled = false;
         }
     }
 
     function evaluateAdminPermissions() {
         const nukeSlot = document.getElementById('admin-nuke-slot');
+        const deskTrigger = document.getElementById('desktop-admin-panel-trigger-slot');
+        const mobTrigger = document.getElementById('mobile-admin-panel-trigger-slot');
+        
         if(currentUser && currentUser.fullTag.toLowerCase() === 'admin#67676') {
-            nukeSlot.innerHTML = `
-                <button onclick="nukeGlobalChatLog()" style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s;">
-                    💥 Nuke
-                </button>
-            `;
+            nukeSlot.innerHTML = `<button onclick="nukeGlobalChatLog()" style="background:#ef4444; color:white; border:none; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:0.75rem; font-weight:600;">💥 Nuke</button>`;
+            
+            const adminLauncherBtn = `<button onclick="toggleAdminPanelOverlay(true)" style="width:100%; background:#eccc68; color:#09090b; border:none; border-radius:6px; padding:10px; font-weight:bold; cursor:pointer; font-size:0.8rem; margin-top:5px; transition:0.2s;">📊 Open Admin Console</button>`;
+            if(deskTrigger) deskTrigger.innerHTML = adminLauncherBtn;
+            if(mobTrigger) mobTrigger.innerHTML = adminLauncherBtn;
         } else {
             nukeSlot.innerHTML = '';
+            if(deskTrigger) deskTrigger.innerHTML = '';
+            if(mobTrigger) mobTrigger.innerHTML = '';
+        }
+    }
+
+    // ✨ NEW: ADMIN METRICS INTERCEPTOR ENGINE
+    async function toggleAdminPanelOverlay(show) {
+        const panel = document.getElementById('admin-panel-root-view');
+        if(!show) { panel.style.display = 'none'; return; }
+        
+        panel.style.display = 'flex';
+        try {
+            const { count: usersCount } = await supabaseClient.from('users').select('*', { count: 'exact', head: true });
+            const { count: msgCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true });
+            
+            // Query total distinct channel IDs mapping configurations
+            const { data: uniqueRooms } = await supabaseClient.from('messages').select('room');
+            const roomSet = new Set((uniqueRooms || []).map(m => m.room).filter(Boolean));
+
+            document.getElementById('metric-users').innerText = usersCount || 0;
+            document.getElementById('metric-messages').innerText = msgCount || 0;
+            document.getElementById('metric-rooms').innerText = roomSet.size || 1;
+        } catch(e) {
+            console.error("Metrics engine reporting fault:", e);
         }
     }
 
     async function nukeGlobalChatLog() {
-        const confirmGlobalNuke = confirm("⚠️ ADMIN COMMAND: Delete ALL messages inside the Global Room?");
-        if(!confirmGlobalNuke) return;
-
+        if(!confirm("⚠️ ADMIN: Clear all Global history rows?")) return;
         try {
-            const { error: nullErr } = await supabaseClient
-                .from('messages')
-                .delete()
-                .is('room', null);
-
-            const { error: eqErr } = await supabaseClient
-                .from('messages')
-                .delete()
-                .eq('room', 'global');
-
-            if (nullErr || eqErr) throw (nullErr || eqErr);
-
-            alert("Global Chat successfully wiped clear! Space optimized. 🏎️💨");
+            await supabaseClient.from('messages').delete().is('room', null);
+            await supabaseClient.from('messages').delete().eq('room', 'global');
             fetchMessages();
-        } catch(err) {
-            console.error("Global wipe failed:", err);
-            alert("Failed to wipe database records.");
-        }
+        } catch(err) { console.error(err); }
     }
 
     async function autoDiscoverRooms() {
         try {
-            const { data, error } = await supabaseClient
-                .from('messages')
-                .select('room')
-                .not('room', 'is', null)
-                .not('room', 'eq', 'global');
-
+            const { data, error } = await supabaseClient.from('messages').select('room').not('room', 'is', null).not('room', 'eq', 'global');
             if (error) throw error;
 
             const foundDms = new Set();
@@ -416,133 +393,113 @@
 
             (data || []).forEach(msg => {
                 const r = msg.room.toLowerCase();
-                const parts = r.split('_');
-                if (parts.includes(lowerTag)) {
-                    const opponent = parts.find(p => p !== lowerTag);
-                    if (opponent) foundDms.add(opponent);
+                // Match single DMs (contains user) or Group Chats prefix blocks
+                if (r.startsWith('group_')) {
+                    const members = r.replace('group_', '').split('-');
+                    if (members.includes(lowerTag)) foundDms.add(msg.room); // Save raw group name channel string
+                } else {
+                    const parts = r.split('_');
+                    if (parts.includes(lowerTag)) {
+                        const opponent = parts.find(p => p !== lowerTag);
+                        if (opponent) foundDms.add(opponent);
+                    }
                 }
             });
 
             activeDms = Array.from(foundDms);
             renderDmList();
-        } catch(e) {
-            console.error("Auto-discovery failed:", e);
-        }
+        } catch(e) { console.error(e); }
     }
 
-    function getRoomId(userA, userB) {
-        return [userA.toLowerCase(), userB.toLowerCase()].sort().join('_');
+    // ✨ NEW: ENGINE HOOK TO SPIN UP MULTI-USER GROUP CREW CHANNELS
+    async function createGroupCrewChannel(isFromMobile = false) {
+        const nameInput = document.getElementById(isFromMobile ? 'mob-group-name-input' : 'group-name-input');
+        const tagsInput = document.getElementById(isFromMobile ? 'mob-group-tags-input' : 'group-tags-input');
+        
+        const crewTitle = nameInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        const rawTags = tagsInput.value.trim().toLowerCase();
+
+        if(!crewTitle || !rawTags) return;
+
+        // Parse list arrays, inject the self creator account tag automatically
+        let memberList = rawTags.split(',').map(t => t.trim()).filter(Boolean);
+        memberList.push(currentUser.fullTag.toLowerCase());
+        memberList.sort(); // Align sequences predictably
+
+        // Form structure identifier string: group_title_user1-user2-user3
+        const finalGroupId = `group_${crewTitle}_` + memberList.join('-');
+
+        nameInput.value = ''; tagsInput.value = '';
+        if(isFromMobile) toggleMobileModal(false);
+
+        // Dispatches seed hello message string to index the channel into visibility loops
+        await supabaseClient.from('messages').insert([{
+            sender: '🚨 System', tag: '#STUDIO', color: '#eccc68',
+            text: `Welcome to the brand new ${crewTitle.toUpperCase()} Crew chat channel!`,
+            room: finalGroupId
+        }]);
+
+        switchTab(finalGroupId, `👥 Crew: ${crewTitle.toUpperCase()}`);
     }
 
-    function handleDmTargetKey(e) {
-        if(e.key === 'Enter') {
-            e.preventDefault();
-            triggerMobileDmSubmit(false);
-        }
-    }
+    function getRoomId(userA, userB) { return [userA.toLowerCase(), userB.toLowerCase()].sort().join('_'); }
+    function handleDmTargetKey(e) { if(e.key === 'Enter') triggerMobileDmSubmit(false); }
 
     function triggerMobileDmSubmit(isFromMobileModal = false) {
         const inputId = isFromMobileModal ? 'mobile-dm-target-input' : 'dm-target-input';
         const targetInput = document.getElementById(inputId);
         const targetUser = targetInput.value.trim();
         
-        if(!targetUser || targetUser.toLowerCase() === currentUser.fullTag.toLowerCase()) {
-            targetInput.value = '';
-            return;
-        }
+        if(!targetUser || targetUser.toLowerCase() === currentUser.fullTag.toLowerCase()) { targetInput.value = ''; return; }
 
-        const exists = activeDms.some(val => val.toLowerCase() === targetUser.toLowerCase());
-        if(!exists) {
-            activeDms.push(targetUser.toLowerCase());
-        }
-
-        if(isFromMobileModal) {
-            toggleMobileModal(false);
-            updateMobileNavHighlights('chats');
-        }
+        if(!activeDms.some(val => val.toLowerCase() === targetUser.toLowerCase())) activeDms.push(targetUser.toLowerCase());
+        if(isFromMobileModal) { toggleMobileModal(false); updateMobileNavHighlights('chats'); }
 
         switchTab(getRoomId(currentUser.fullTag, targetUser), `💬 ${targetUser}`);
         targetInput.value = '';
     }
 
-    async function nukeChatRoom(targetUser, event) {
+    async function nukeChatRoom(targetId, event) {
         event.stopPropagation(); 
-        
-        const targetRoom = getRoomId(currentUser.fullTag, targetUser);
-        const confirmNuke = confirm(`⚠️ Yo, you sure? This will delete ALL messages inside this chat for everyone!`);
-        if(!confirmNuke) return;
+        if(!confirm(`⚠️ Delete all messages inside this channel loop?`)) return;
 
         try {
-            const { error } = await supabaseClient
-                .from('messages')
-                .delete()
-                .eq('room', targetRoom);
-
-            if (error) throw error;
-
-            activeDms = activeDms.filter(u => u.toLowerCase() !== targetUser.toLowerCase());
-            
-            if (currentTab === targetRoom) {
-                switchTab('global', '🌍 global-yapp');
-                updateMobileNavHighlights('global');
-            } else {
-                renderDmList();
-            }
-        } catch (err) {
-            console.error("Could not delete room:", err);
-            alert("DB Error wiping text layers. Check logs!");
-        }
+            await supabaseClient.from('messages').delete().eq('room', targetId);
+            activeDms = activeDms.filter(u => u.toLowerCase() !== targetId.toLowerCase());
+            if (currentTab === targetId.toLowerCase()) { switchTab('global', '🌍 global-yapp'); updateMobileNavHighlights('global'); }
+            else renderDmList();
+        } catch (err) { console.error(err); }
     }
 
     async function executeSingleMessageDelete(msgId) {
-        try {
-            const { error } = await supabaseClient
-                .from('messages')
-                .delete()
-                .eq('id', msgId);
-
-            if (error) throw error;
-            fetchMessages(); 
-        } catch (err) {
-            console.error("Failed to delete specific text layer:", err);
-        }
+        try { await supabaseClient.from('messages').delete().eq('id', msgId); fetchMessages(); } catch (err) { console.error(err); }
     }
 
     function renderDmList() {
         const desktopContainer = document.getElementById('dm-list-container');
         const mobileContainer = document.getElementById('mobile-dm-list-container');
-        
-        desktopContainer.innerHTML = '';
-        mobileContainer.innerHTML = '';
+        desktopContainer.innerHTML = ''; mobileContainer.innerHTML = '';
         
         if (!currentUser) return; 
-        
-        activeDms.forEach(user => {
-            const roomId = getRoomId(currentUser.fullTag, user);
-            
+
+        activeDms.forEach(id => {
+            const isGroup = id.startsWith('group_');
+            const displayName = isGroup ? `👥 ${id.split('_')[1].toUpperCase()}` : `💬 ${id}`;
+            const targetRoomKey = isGroup ? id : getRoomId(currentUser.fullTag, id);
+
+            // Render Desktop Anchor
             const btnDesktop = document.createElement('div');
-            btnDesktop.className = `chan-btn ${currentTab === roomId ? 'active' : ''}`;
-            btnDesktop.onclick = () => switchTab(roomId, `💬 ${user}`);
-            btnDesktop.innerHTML = `
-                <div class="chan-left">💬 ${user}</div>
-                <div class="nuke-room-trigger" onclick="nukeChatRoom('${user}', event)">✕</div>
-            `;
+            btnDesktop.className = `chan-btn ${currentTab === targetRoomKey.toLowerCase() ? 'active' : ''}`;
+            btnDesktop.onclick = () => switchTab(targetRoomKey, displayName);
+            btnDesktop.innerHTML = `<div class="chan-left">${displayName}</div><div class="nuke-room-trigger" onclick="nukeChatRoom('${targetRoomKey}', event)">✕</div>`;
             desktopContainer.appendChild(btnDesktop);
 
+            // Render Mobile Anchor
             const btnMobile = document.createElement('div');
-            btnMobile.className = `chan-btn ${currentTab === roomId ? 'active' : ''}`;
-            btnMobile.style.padding = "16px 12px"; 
-            btnMobile.style.background = "#18181b";
-            btnMobile.style.border = "1px solid #27272a";
-            btnMobile.onclick = () => {
-                switchTab(roomId, `💬 ${user}`);
-                toggleMobileModal(false);
-                updateMobileNavHighlights('chats');
-            };
-            btnMobile.innerHTML = `
-                <div class="chan-left" style="font-size: 1rem; font-weight: 500;">💬 ${user}</div>
-                <div class="nuke-room-trigger" style="font-size: 1.1rem; padding: 6px 12px;" onclick="nukeChatRoom('${user}', event)">✕</div>
-            `;
+            btnMobile.className = `chan-btn ${currentTab === targetRoomKey.toLowerCase() ? 'active' : ''}`;
+            btnMobile.style.padding = "16px 12px"; btnMobile.style.background = "#18181b"; btnMobile.style.border = "1px solid #27272a";
+            btnMobile.onclick = () => { switchTab(targetRoomKey, displayName); toggleMobileModal(false); updateMobileNavHighlights('chats'); };
+            btnMobile.innerHTML = `<div class="chan-left" style="font-size: 1rem; font-weight: 500;">${displayName}</div><div class="nuke-room-trigger" style="font-size: 1.1rem; padding: 6px 12px;" onclick="nukeChatRoom('${targetRoomKey}', event)">✕</div>`;
             mobileContainer.appendChild(btnMobile);
         });
     }
@@ -553,33 +510,21 @@
         document.getElementById('chat-title-text').innerText = titleText;
         
         const nukeSlot = document.getElementById('admin-nuke-slot');
-        if (currentUser && currentTab === 'global' && currentUser.fullTag.toLowerCase() === 'admin#67676') {
-            nukeSlot.style.display = 'block';
-        } else {
-            nukeSlot.style.display = 'none';
-        }
+        if (currentUser && currentTab === 'global' && currentUser.fullTag.toLowerCase() === 'admin#67676') nukeSlot.style.display = 'block';
+        else nukeSlot.style.display = 'none';
 
-        renderDmList();
-        fetchMessages();
+        renderDmList(); fetchMessages();
     }
 
     function handleMobileNavClick(type) {
-        if(type === 'global') {
-            toggleMobileModal(false);
-            switchTab('global', '🌍 global-yapp');
-            updateMobileNavHighlights('global');
-        } else if(type === 'chats') {
-            toggleMobileModal(true);
-        }
+        if(type === 'global') { toggleMobileModal(false); toggleAdminPanelOverlay(false); switchTab('global', '🌍 global-yapp'); updateMobileNavHighlights('global'); }
+        else if(type === 'chats') { toggleMobileModal(true); }
     }
 
     function toggleMobileModal(show) {
         const modal = document.getElementById('chats-overlay-modal');
-        if (show) {
-            modal.classList.add('slide-active');
-        } else {
-            modal.classList.remove('slide-active');
-        }
+        if (show) modal.classList.add('slide-active');
+        else modal.classList.remove('slide-active');
     }
 
     function updateMobileNavHighlights(activeType) {
@@ -589,11 +534,8 @@
 
     async function fetchMessages() {
         let query = supabaseClient.from('messages').select('*');
-        if (currentTab === 'global') {
-            query = query.or('room.is.null,room.eq.global');
-        } else {
-            query = query.eq('room', currentTab);
-        }
+        if (currentTab === 'global') query = query.or('room.is.null,room.eq.global');
+        else query = query.eq('room', currentTab);
         const { data, error } = await query.order('created_at', { ascending: true });
         if (error) console.error(error);
         else renderMessages(data || []);
@@ -601,18 +543,9 @@
 
     async function dispatchMessage() {
         const input = document.getElementById('chat-raw-input');
-        const text = input.value.trim();
-        if(!text) return;
+        const text = input.value.trim(); if(!text) return;
 
-        const { error } = await supabaseClient.from('messages').insert([{
-            sender: currentUser.username,
-            tag: currentUser.tag,
-            color: currentUser.color,
-            text: text,
-            room: currentTab
-        }]);
-
-        if (error) console.error(error);
+        await supabaseClient.from('messages').insert([{ sender: currentUser.username, tag: currentUser.tag, color: currentUser.color, text: text, room: currentTab }]);
         input.value = '';
     }
 
@@ -620,47 +553,41 @@
         supabaseClient
             .channel('public:messages')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, (payload) => {
-                if (payload.eventType === 'DELETE') {
-                    autoDiscoverRooms();
-                    fetchMessages();
-                    return;
-                }
-
+                if (payload.eventType === 'DELETE') { autoDiscoverRooms(); fetchMessages(); return; }
                 if (payload.eventType === 'INSERT') {
                     const newMsg = payload.new;
                     if (newMsg.room && newMsg.room !== 'global') {
-                        const structuralParts = newMsg.room.toLowerCase().split('_');
-                        if (currentUser && structuralParts.includes(currentUser.fullTag.toLowerCase())) {
-                            const senderFullTag = `${newMsg.sender}${newMsg.tag}`.toLowerCase();
-                            const exists = activeDms.some(val => val.toLowerCase() === senderFullTag);
-                            if (senderFullTag !== currentUser.fullTag.toLowerCase() && !exists) {
-                                activeDms.push(senderFullTag);
-                                renderDmList();
+                        const r = newMsg.room.toLowerCase();
+                        if (r.startsWith('group_')) {
+                            const members = r.replace('group_', '').split('-');
+                            if (currentUser && members.includes(currentUser.fullTag.toLowerCase()) && !activeDms.includes(newMsg.room)) {
+                                activeDms.push(newMsg.room); renderDmList();
+                            }
+                        } else {
+                            const structuralParts = r.split('_');
+                            if (currentUser && structuralParts.includes(currentUser.fullTag.toLowerCase())) {
+                                const senderFullTag = `${newMsg.sender}${newMsg.tag}`.toLowerCase();
+                                if (senderFullTag !== currentUser.fullTag.toLowerCase() && !activeDms.some(val => val.toLowerCase() === senderFullTag)) {
+                                    activeDms.push(senderFullTag); renderDmList();
+                                }
                             }
                         }
                     }
-
                     const isGlobalMatch = currentTab === 'global' && (!newMsg.room || newMsg.room.toLowerCase() === 'global');
                     const isPrivateMatch = currentTab === (newMsg.room ? newMsg.room.toLowerCase() : '');
-                    if (isGlobalMatch || isPrivateMatch) {
-                        fetchMessages();
-                    }
+                    if (isGlobalMatch || isPrivateMatch) fetchMessages();
                 }
-            })
-            .subscribe();
+            }).subscribe();
     }
 
     function handleChatKey(e) { if(e.key === 'Enter') dispatchMessage(); }
 
     function renderMessages(messagesList) {
-        const pane = document.getElementById('messages-root');
-        pane.innerHTML = '';
-        
+        const pane = document.getElementById('messages-root'); pane.innerHTML = '';
         if (!currentUser) return; 
 
         messagesList.forEach(msg => {
             const timeStr = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-            
             const isMyOwnMessage = (msg.sender === currentUser.username && msg.tag === currentUser.tag);
             const isNotGlobalRoom = (currentTab !== 'global');
             const isAdminSession = (currentUser.fullTag.toLowerCase() === 'admin#67676');
@@ -670,8 +597,7 @@
                 deleteButtonHtml = `<button class="msg-delete-btn" onclick="executeSingleMessageDelete(${msg.id})">Delete</button>`;
             }
 
-            const row = document.createElement('div');
-            row.className = 'message-row';
+            const row = document.createElement('div'); row.className = 'message-row';
             row.innerHTML = `
                 <div class="pfp-circle" style="background: ${msg.color || '#3f3f46'}">${(msg.sender || 'Y')[0]}</div>
                 <div class="msg-content">
