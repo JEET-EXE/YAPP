@@ -666,12 +666,16 @@
     }
 
     function closeMobileDrawers() {
-        document.getElementById('chats-overlay-modal').style.display = 'none';
-        const navGlobal = document.getElementById('mobile-nav-global');
-        const navChats = document.getElementById('mobile-nav-chats');
-        if (navGlobal) navGlobal.classList.add('active');
-        if (navChats) navChats.classList.remove('active');
-    }
+    document.getElementById('chats-overlay-modal').style.display = 'none';
+    // Removed the hardcoded class toggles from here so it doesn't glitch the UI
+}
+
+function updateMobileNavHighlights(activeType) {
+    const navGlobal = document.getElementById('mobile-nav-global');
+    const navChats = document.getElementById('mobile-nav-chats');
+    if(navGlobal) navGlobal.classList.toggle('active', activeType === 'global');
+    if(navChats) navChats.classList.toggle('active', activeType === 'chats');
+}
 
     /* -------------------------------------------
        AUTH & DATABASE LOGIC (XSS Patched & Tag Restored)
@@ -742,97 +746,77 @@
     }
 
     async function executeAuthenticationFlow(mode) {
-        document.getElementById('error-message').style.display = 'none';
-        document.getElementById('success-message').style.display = 'none';
-        
-        const username = document.getElementById('reg-user').value.trim();
-        let tag = document.getElementById('reg-tag').value.trim();
-        const pass = document.getElementById('reg-pass').value;
-        const color = document.getElementById('reg-color').value;
+    document.getElementById('error-message').style.display = 'none';
+    document.getElementById('success-message').style.display = 'none';
+    
+    // Read directly from both boxes, no weird string splitting needed anymore
+    const username = document.getElementById('reg-user').value.trim();
+    let tag = document.getElementById('reg-tag').value.trim();
+    const pass = document.getElementById('reg-pass').value;
+    const color = document.getElementById('reg-color').value;
 
-        if (!username || !pass) { showBanner('error', 'Fill in your details, bro!'); return; }
-        
-        // User strictly requested to choose their own tag
-        if (!tag.startsWith('#')) { tag = '#' + tag; }
-        if (tag.length < 2) { tag = '#12345'; }
+    if (!username || !pass) { showBanner('error', 'Fill in your details, bro!'); return; }
+    
+    if (!tag.startsWith('#')) { tag = '#' + tag; }
+    if (tag.length < 2) { tag = '#12345'; }
 
-        const combinedTagLower = `${username}${tag}`.toLowerCase();
-        
-        const loginBtn = document.getElementById('login-action-btn');
-        const regBtn = document.getElementById('register-action-btn');
-        loginBtn.disabled = true; regBtn.disabled = true;
+    const combinedTagLower = `${username}${tag}`.toLowerCase();
+    
+    const loginBtn = document.getElementById('login-action-btn');
+    const regBtn = document.getElementById('register-action-btn');
+    loginBtn.disabled = true; regBtn.disabled = true;
 
-        try {
-            // Check if user is banned
-            const { data: banCheck } = await supabaseClient
-                .from('bans')
-                .select('target_fulltag')
-                .eq('target_fulltag', combinedTagLower)
-                .maybeSingle();
+    try {
+        const { data: banCheck } = await supabaseClient.from('bans').select('target_fulltag').eq('target_fulltag', combinedTagLower).maybeSingle();
 
-            if (banCheck) { 
-                showBanner('error', '🚨 Nice try. This account signature is blacklisted.'); 
+        if (banCheck) { 
+            showBanner('error', '🚨 Nice try. This account signature is blacklisted.'); 
+            loginBtn.disabled = false; regBtn.disabled = false; 
+            return; 
+        }
+
+        const { data: userRow, error: fetchErr } = await supabaseClient.from('users').select('username, tag, password, color').eq('username', username).eq('tag', tag).maybeSingle();
+        if (fetchErr) throw fetchErr;
+
+        if (mode === 'LOGIN') {
+            if (!userRow) { 
+                showBanner('error', '❌ Account not found! Double check your Tag or Register.'); 
                 loginBtn.disabled = false; regBtn.disabled = false; 
                 return; 
             }
-
-            // Secure fetch (No passwords exposed to unauthenticated users via API)
-            const { data: userRow, error: fetchErr } = await supabaseClient
-                .from('users')
-                .select('username, tag, password, color')
-                .eq('username', username)
-                .eq('tag', tag)
-                .maybeSingle();
-
-            if (fetchErr) throw fetchErr;
-
-            if (mode === 'LOGIN') {
-                if (!userRow) { 
-                    showBanner('error', '❌ Account not found! Double check your Tag or Register.'); 
-                    loginBtn.disabled = false; regBtn.disabled = false; 
-                    return; 
-                }
-                if (userRow.password !== pass) { 
-                    showBanner('error', '❌ Invalid Credentials!'); 
-                    loginBtn.disabled = false; regBtn.disabled = false; 
-                    return; 
-                }
-                
-                currentUser = { 
-                    username: userRow.username, 
-                    tag: userRow.tag, 
-                    color: userRow.color, 
-                    fullTag: `${userRow.username}${userRow.tag}` 
-                };
-                localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
-                initMainView();
-            } 
-            else if (mode === 'REGISTER') {
-                if (userRow) { 
-                    showBanner('error', `❌ Profile ${username}${tag} already taken! Try another Tag or Login.`); 
-                    loginBtn.disabled = false; regBtn.disabled = false; 
-                    return; 
-                }
-                if (username.toLowerCase() === 'admin') { 
-                    showBanner('error', '🚨 Admin tag is reserved for core system.'); 
-                    loginBtn.disabled = false; regBtn.disabled = false; 
-                    return; 
-                }
-                
-                const { error: insertError } = await supabaseClient
-                    .from('users')
-                    .insert([{ username, password: pass, tag, color }]);
-                
-                if (insertError) throw insertError;
-                
-                showBanner('success', `🎉 Registered as ${username}${tag}! Click LOGIN to enter.`);
-                loginBtn.disabled = false; regBtn.disabled = false;
+            if (userRow.password !== pass) { 
+                showBanner('error', '❌ Invalid Credentials!'); 
+                loginBtn.disabled = false; regBtn.disabled = false; 
+                return; 
             }
-        } catch (err) {
-            showBanner('error', 'Network Error: ' + err.message);
+            
+            currentUser = { username: userRow.username, tag: userRow.tag, color: userRow.color, fullTag: `${userRow.username}${userRow.tag}` };
+            localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
+            initMainView();
+        } 
+        else if (mode === 'REGISTER') {
+            if (userRow) { 
+                showBanner('error', `❌ Profile ${username}${tag} already taken! Try another Tag or Login.`); 
+                loginBtn.disabled = false; regBtn.disabled = false; 
+                return; 
+            }
+            if (username.toLowerCase() === 'admin') { 
+                showBanner('error', '🚨 Admin tag is reserved for core system.'); 
+                loginBtn.disabled = false; regBtn.disabled = false; 
+                return; 
+            }
+            
+            const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color }]);
+            if (insertError) throw insertError;
+            
+            showBanner('success', `🎉 Registered as ${username}${tag}! Click LOGIN to enter.`);
             loginBtn.disabled = false; regBtn.disabled = false;
         }
+    } catch (err) {
+        showBanner('error', 'Network Error: ' + err.message);
+        loginBtn.disabled = false; regBtn.disabled = false;
     }
+}
 
     /* -------------------------------------------
        ADMIN CORE (Passwords Hidden & Safe)
@@ -1139,26 +1123,34 @@
     }
 
     function switchTab(tabId, titleText) {
-        currentTab = tabId.toLowerCase();
-        
-        // Clear read badges
-        roomsWithUnreadBadges = roomsWithUnreadBadges.filter(r => r !== currentTab);
-        
-        // Update UI Highlights
-        document.getElementById('global-chan-btn').classList.toggle('active', currentTab === 'global');
-        document.getElementById('chat-title-text').textContent = titleText;
-        
-        // Show Nuke Button for Admin
-        const nukeSlot = document.getElementById('admin-nuke-slot');
-        if (currentUser && currentTab === 'global' && currentUser.fullTag === 'ADMIN#67676') {
-            nukeSlot.style.display = 'block';
-        } else {
-            nukeSlot.style.display = 'none';
-        }
-
-        renderDmList(); 
-        fetchMessages();
+    currentTab = tabId.toLowerCase();
+    
+    // Clear read badges
+    roomsWithUnreadBadges = roomsWithUnreadBadges.filter(r => r !== currentTab);
+    
+    // Update Desktop Highlights
+    document.getElementById('global-chan-btn').classList.toggle('active', currentTab === 'global');
+    
+    // Update Mobile Nav Highlights dynamically
+    if (currentTab === 'global') {
+        updateMobileNavHighlights('global');
+    } else {
+        updateMobileNavHighlights('chats');
     }
+
+    document.getElementById('chat-title-text').textContent = titleText;
+    
+    // Show Nuke Button for Admin
+    const nukeSlot = document.getElementById('admin-nuke-slot');
+    if (currentUser && currentTab === 'global' && currentUser.fullTag === 'ADMIN#67676') {
+        nukeSlot.style.display = 'block';
+    } else {
+        nukeSlot.style.display = 'none';
+    }
+
+    renderDmList(); 
+    fetchMessages();
+}
 
     /* -------------------------------------------
        MESSAGE SYNC & RENDER (XSS SAFE)
