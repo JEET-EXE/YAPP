@@ -329,8 +329,6 @@
     let currentTab = 'global'; 
     let activeDms = []; 
     let roomsWithUnreadBadges = [];
-    
-    // ✨ TRACKING VARIABLE: Stores the maximum primary key seen during scan loops
     let highestScannedMessageIdOnBoot = 0;
 
     window.addEventListener('DOMContentLoaded', () => { checkSavedUserSession(); });
@@ -338,13 +336,15 @@
     function showError(text) {
         document.getElementById('success-message').style.display = 'none';
         const errBox = document.getElementById('error-message');
-        errBox.innerText = text; errBox.style.display = 'block';
+        errBox.textContent = text;
+        errBox.style.display = 'block';
     }
 
     function showSuccess(text) {
         document.getElementById('error-message').style.display = 'none';
         const succBox = document.getElementById('success-message');
-        succBox.innerText = text; succBox.style.display = 'block';
+        succBox.textContent = text;
+        succBox.style.display = 'block';
     }
 
     function clearStatusBanners() {
@@ -366,29 +366,45 @@
 
     async function initializeMainApplicationView() {
         try {
-            const { data: isBanned } = await supabaseClient.from('bans').select('*').eq('target_fulltag', currentUser.fullTag.toLowerCase()).maybeSingle();
-            if(isBanned) {
+            const { data: isBanned } = await supabaseClient
+                .from('bans')
+                .select('target_fulltag')
+                .eq('target_fulltag', currentUser.fullTag.toLowerCase())
+                .maybeSingle();
+
+            if (isBanned) {
                 localStorage.removeItem('yapp_cached_user');
                 alert("🚨 SECURITY AGENT: This device signature has been permanently blacklisted by Admin.");
                 window.location.reload();
                 return;
             }
-        } catch(e){}
+        } catch(e) {}
 
-        document.getElementById('user-profile-summary').innerHTML = `
-            <div class="pfp-circle" style="background: ${currentUser.color}">${currentUser.username[0]}</div>
-            <div>${currentUser.username}<span>${currentUser.tag}</span></div>
-        `;
+        const profileSummary = document.getElementById('user-profile-summary');
+        profileSummary.innerHTML = '';
+        
+        const pfpCircle = document.createElement('div');
+        pfpCircle.className = 'pfp-circle';
+        pfpCircle.style.background = currentUser.color;
+        pfpCircle.textContent = (currentUser.username[0] || 'Y').toUpperCase();
+
+        const userTagWrap = document.createElement('div');
+        userTagWrap.textContent = currentUser.username + ' ';
+        const spanTag = document.createElement('span');
+        spanTag.textContent = currentUser.tag;
+        userTagWrap.appendChild(spanTag);
+
+        profileSummary.appendChild(pfpCircle);
+        profileSummary.appendChild(userTagWrap);
+
         const mobTitle = document.getElementById('mobile-modal-title-logout');
-        if (mobTitle) mobTitle.innerText = `${currentUser.username}${currentUser.tag} (Logout 🚪)`;
+        if (mobTitle) mobTitle.textContent = `${currentUser.username}${currentUser.tag} (Logout 🚪)`;
 
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('app-screen').classList.remove('hidden');
         
         evaluateAdminPermissions();
         await autoDiscoverRooms();
-        
-        // Run the optimized memory-cached scan engine
         await runOfflineMessageScanner();
         
         fetchMessages();
@@ -409,19 +425,23 @@
         const pass = document.getElementById('reg-pass').value;
         const color = document.getElementById('reg-color').value;
 
-        if(!username || !pass) { showError('Fill in your details, bro!'); return; }
-        if(!tag.startsWith('#')) { tag = '#' + tag; }
-        if(tag.length < 2) { tag = '#12345'; }
+        if (!username || !pass) { showError('Fill in your details, bro!'); return; }
+        if (!tag.startsWith('#')) { tag = '#' + tag; }
+        if (tag.length < 2) { tag = '#12345'; }
 
         const combinedTagLower = `${username}${tag}`.toLowerCase();
-
         const mainBtn = document.getElementById('login-action-btn');
         const secondaryBtn = document.getElementById('register-action-btn');
         mainBtn.disabled = true; secondaryBtn.disabled = true;
 
         try {
-            const { data: banCheck } = await supabaseClient.from('bans').select('*').eq('target_fulltag', combinedTagLower).maybeSingle();
-            if(banCheck) {
+            const { data: banCheck } = await supabaseClient
+                .from('bans')
+                .select('target_fulltag')
+                .eq('target_fulltag', combinedTagLower)
+                .maybeSingle();
+
+            if (banCheck) {
                 showError('🚨 Nice try, bro! This account sequence has been permanently banned from the server.');
                 mainBtn.disabled = false; secondaryBtn.disabled = false;
                 return;
@@ -429,7 +449,7 @@
 
             const { data: userRow, error: fetchError } = await supabaseClient
                 .from('users')
-                .select('*')
+                .select('username, tag, password, color')
                 .eq('username', username)
                 .eq('tag', tag)
                 .maybeSingle();
@@ -447,11 +467,15 @@
                     mainBtn.disabled = false; secondaryBtn.disabled = false;
                     return;
                 }
-                currentUser = { username: userRow.username, tag: userRow.tag, color: userRow.color, fullTag: `${userRow.username}${userRow.tag}` };
+                currentUser = { 
+                    username: userRow.username, 
+                    tag: userRow.tag, 
+                    color: userRow.color, 
+                    fullTag: `${userRow.username}${userRow.tag}` 
+                };
                 localStorage.setItem('yapp_cached_user', JSON.stringify(currentUser));
                 initializeMainApplicationView();
             } 
-            
             else if (mode === 'REGISTER') {
                 if (userRow) {
                     showError(`❌ Profile combination ${username}${tag} already registered! Try Logging in.`);
@@ -464,13 +488,15 @@
                     return;
                 }
 
-                const { error: insertError } = await supabaseClient.from('users').insert([{ username, password: pass, tag, color }]);
+                const { error: insertError } = await supabaseClient
+                    .from('users')
+                    .insert([{ username, password: pass, tag, color }]);
+
                 if (insertError) throw insertError;
                 
                 showSuccess('🎉 Account registered successfully! Click Login to enter the lobby.');
                 mainBtn.disabled = false; secondaryBtn.disabled = false;
             }
-
         } catch (err) {
             showError('Database logic error: ' + err.message);
             mainBtn.disabled = false; secondaryBtn.disabled = false;
@@ -482,23 +508,23 @@
         const deskTrigger = document.getElementById('desktop-admin-panel-trigger-slot');
         const mobTrigger = document.getElementById('mobile-admin-panel-trigger-slot');
         
-        if(currentUser && currentUser.fullTag === 'ADMIN#67676') {
+        if (currentUser && currentUser.fullTag === 'ADMIN#67676') {
             nukeSlot.innerHTML = `<button onclick="nukeGlobalChatLog()" style="background:#ef4444; color:white; border:none; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:0.75rem; font-weight:600;">💥 Nuke</button>`;
             
             const adminLauncherBtn = `<button onclick="toggleAdminPanelOverlay(true)" style="width:100%; background:#eccc68; color:#09090b; border:none; border-radius:6px; padding:10px; font-weight:bold; cursor:pointer; font-size:0.8rem; margin-top:5px; transition:0.2s;">📊 Open Admin Console</button>`;
-            if(deskTrigger) deskTrigger.innerHTML = adminLauncherBtn;
-            if(mobTrigger) mobTrigger.innerHTML = adminLauncherBtn;
+            if (deskTrigger) deskTrigger.innerHTML = adminLauncherBtn;
+            if (mobTrigger) mobTrigger.innerHTML = adminLauncherBtn;
         } else {
             nukeSlot.innerHTML = '';
-            if(deskTrigger) deskTrigger.innerHTML = '';
-            if(mobTrigger) mobTrigger.innerHTML = '';
+            if (deskTrigger) deskTrigger.innerHTML = '';
+            if (mobTrigger) mobTrigger.innerHTML = '';
         }
     }
 
     async function toggleAdminPanelOverlay(show) {
         const panel = document.getElementById('admin-panel-root-view');
-        if(!show) { panel.style.display = 'none'; return; }
-        if(currentUser.fullTag !== 'ADMIN#67676') return;
+        if (!show) { panel.style.display = 'none'; return; }
+        if (currentUser.fullTag !== 'ADMIN#67676') return;
         
         panel.style.display = 'flex';
         await refreshLiveDatabaseDirectory();
@@ -506,11 +532,21 @@
 
     async function refreshLiveDatabaseDirectory() {
         try {
-            const { data: allUsers, error: usersErr } = await supabaseClient.from('users').select('*').order('username', { ascending: true });
-            const { count: msgCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true });
-            const { data: uniqueRooms } = await supabaseClient.from('messages').select('room');
+            // SAFE QUERY: Passwords are completely omitted from client selection
+            const { data: allUsers, error: usersErr } = await supabaseClient
+                .from('users')
+                .select('username, tag, color')
+                .order('username', { ascending: true });
+
+            const { count: msgCount } = await supabaseClient
+                .from('messages')
+                .select('*', { count: 'exact', head: true });
+
+            const { data: uniqueRooms } = await supabaseClient
+                .from('messages')
+                .select('room');
             
-            if(usersErr) throw usersErr;
+            if (usersErr) throw usersErr;
 
             const roomSet = new Set((uniqueRooms || []).map(m => m.room).filter(Boolean));
 
@@ -525,16 +561,42 @@
                 const tr = document.createElement('tr');
                 const fullStringTag = `${account.username}${account.tag}`;
                 
-                let operationActionNode = `<button class="ban-hammer-action" onclick="dropTheBanHammer('${account.username}', '${account.tag}')">💥 Ban</button>`;
-                if (fullStringTag === 'ADMIN#67676') { operationActionNode = `<span style="color:#71717a; font-size:0.75rem;">Immune</span>`; }
+                const tdUser = document.createElement('td');
+                tdUser.style.fontWeight = '600';
+                tdUser.style.color = '#fff';
+                tdUser.textContent = account.username || 'N/A';
 
-                tr.innerHTML = `
-                    <td style="font-weight:600; color:#fff;">${account.username || 'N/A'}</td>
-                    <td style="color:#a1a1aa;">${account.tag || 'N/A'}</td>
-                    <td style="font-family:monospace; color:#eccc68;">${account.password || '••••'}</td>
-                    <td><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${account.color || '#fff'}; margin-right:6px;"></span>${account.color || '#fff'}</td>
-                    <td>${operationActionNode}</td>
-                `;
+                const tdTag = document.createElement('td');
+                tdTag.style.color = '#a1a1aa';
+                tdTag.textContent = account.tag || 'N/A';
+
+                const tdPass = document.createElement('td');
+                tdPass.style.fontFamily = 'monospace';
+                tdPass.style.color = '#71717a';
+                tdPass.textContent = '••••••••'; // Encrypted / Hidden
+
+                const tdColor = document.createElement('td');
+                tdColor.innerHTML = `<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${account.color || '#fff'}; margin-right:6px;"></span>`;
+                const colorCode = document.createTextNode(account.color || '#fff');
+                tdColor.appendChild(colorCode);
+
+                const tdAction = document.createElement('td');
+                if (fullStringTag === 'ADMIN#67676') {
+                    tdAction.innerHTML = `<span style="color:#71717a; font-size:0.75rem;">Immune</span>`;
+                } else {
+                    const btn = document.createElement('button');
+                    btn.className = 'ban-hammer-action';
+                    btn.textContent = '💥 Ban';
+                    btn.onclick = () => dropTheBanHammer(account.username, account.tag);
+                    tdAction.appendChild(btn);
+                }
+
+                tr.appendChild(tdUser);
+                tr.appendChild(tdTag);
+                tr.appendChild(tdPass);
+                tr.appendChild(tdColor);
+                tr.appendChild(tdAction);
+
                 rowsContainer.appendChild(tr);
             });
         } catch(e) { console.error(e); }
@@ -542,8 +604,8 @@
 
     async function dropTheBanHammer(targetUser, targetTag) {
         const fullCombo = `${targetUser}${targetTag}`;
-        if(currentUser.fullTag !== 'ADMIN#67676') return;
-        if(!confirm(`⚠️ WARNING: Are you sure you want to completely destroy ${fullCombo}? \nThis will wipe all their messages, flush their profile data, and block their login token forever!`)) return;
+        if (currentUser.fullTag !== 'ADMIN#67676') return;
+        if (!confirm(`⚠️ WARNING: Are you sure you want to completely destroy ${fullCombo}? \nThis will wipe all their messages, flush their profile data, and block their login token forever!`)) return;
 
         try {
             await supabaseClient.from('bans').insert([{ target_fulltag: fullCombo.toLowerCase() }]);
@@ -556,8 +618,8 @@
     }
 
     async function nukeGlobalChatLog() {
-        if(currentUser.fullTag !== 'ADMIN#67676') return;
-        if(!confirm("⚠️ ADMIN: Clear all Global history rows?")) return;
+        if (currentUser.fullTag !== 'ADMIN#67676') return;
+        if (!confirm("⚠️ ADMIN: Clear all Global history rows?")) return;
         try {
             await supabaseClient.from('messages').delete().is('room', null);
             await supabaseClient.from('messages').delete().eq('room', 'global');
@@ -568,7 +630,12 @@
     async function autoDiscoverRooms() {
         if (!currentUser) return;
         try {
-            const { data, error } = await supabaseClient.from('messages').select('room').not('room', 'is', null).not('room', 'eq', 'global');
+            const { data, error } = await supabaseClient
+                .from('messages')
+                .select('room')
+                .not('room', 'is', null)
+                .not('room', 'eq', 'global');
+
             if (error) throw error;
 
             const foundDms = new Set();
@@ -593,31 +660,25 @@
         } catch(e) { console.error(e); }
     }
 
-    // ✨ FIXED: Memory-Cached Notification Core Loop Engine
     async function runOfflineMessageScanner() {
         if (!currentUser) return;
         try {
             const lowerUserTag = currentUser.fullTag.toLowerCase();
-            
-            // Fetch the maximum message ID saved locally from your last "OK" click session
             const cachedCheckpointId = parseInt(localStorage.getItem(`yapp_last_read_id_${lowerUserTag}`)) || 0;
 
             const { data: recentYaps, error } = await supabaseClient
                 .from('messages')
-                .select('*')
+                .select('id, sender, tag, room')
                 .order('id', { ascending: false })
                 .limit(50);
                 
             if (error) throw error;
             if (!recentYaps || recentYaps.length === 0) return;
 
-            // Track the absolute highest message row ID currently sitting on the live server
             highestScannedMessageIdOnBoot = Math.max(...recentYaps.map(m => m.id));
-
             let unreadSendersList = new Set();
 
             recentYaps.forEach(yap => {
-                // 🚨 KEY FIX: Only trigger an alert badge if the message row ID is higher than your last cached checkpoint!
                 if (yap.id > cachedCheckpointId) {
                     const senderSignature = `${yap.sender}${yap.tag}`;
                     if (senderSignature.toLowerCase() !== lowerUserTag) {
@@ -626,13 +687,13 @@
                         if (r.startsWith('group_')) {
                             const members = r.replace('group_', '').split('-');
                             if (members.includes(lowerUserTag)) {
-                                if(!roomsWithUnreadBadges.includes(r)) roomsWithUnreadBadges.push(r);
+                                if (!roomsWithUnreadBadges.includes(r)) roomsWithUnreadBadges.push(r);
                                 unreadSendersList.add(`👥 #${r.split('_')[1].toUpperCase()}`);
                             }
                         } else if (r !== 'global') {
                             const structuralParts = r.split('_');
                             if (structuralParts.includes(lowerUserTag)) {
-                                if(!roomsWithUnreadBadges.includes(r)) roomsWithUnreadBadges.push(r);
+                                if (!roomsWithUnreadBadges.includes(r)) roomsWithUnreadBadges.push(r);
                                 unreadSendersList.add(`💬 ${yap.sender}${yap.tag}`);
                             }
                         }
@@ -640,31 +701,39 @@
                 }
             });
 
-            // Summon the popup only if true, unread behind-the-scenes data columns are verified
             if (unreadSendersList.size > 0) {
                 const overlay = document.createElement('div');
                 overlay.className = 'offline-modal-overlay';
                 overlay.id = 'offline-popup-guard-root';
                 
-                overlay.innerHTML = `
-                    <div class="offline-alert-box">
-                        <h3>🚨 UNREAD DATA DETECTED</h3>
-                        <p>Welcome back! You have unread background messages waiting inside your feed from:<br><br><strong>${Array.from(unreadSendersList).join(', ')}</strong></p>
-                        <button class="btn" onclick="dismissOfflineNotificationModal()">OK, Show Me</button>
-                    </div>
-                `;
+                const box = document.createElement('div');
+                box.className = 'offline-alert-box';
+
+                const h3 = document.createElement('h3');
+                h3.textContent = '🚨 UNREAD DATA DETECTED';
+
+                const p = document.createElement('p');
+                p.textContent = `Welcome back! You have unread background messages waiting inside your feed from: ${Array.from(unreadSendersList).join(', ')}`;
+
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.textContent = 'OK, Show Me';
+                btn.onclick = dismissOfflineNotificationModal;
+
+                box.appendChild(h3);
+                box.appendChild(p);
+                box.appendChild(btn);
+                overlay.appendChild(box);
                 document.body.appendChild(overlay);
             } else {
-                // If everything is already read, silently keep your local memory alignment up to date
                 localStorage.setItem(`yapp_last_read_id_${lowerUserTag}`, highestScannedMessageIdOnBoot);
             }
         } catch(e) { console.error(e); }
     }
 
-    // ✨ FIXED: Saves the current highest message ID to browser cache memory on click
     function dismissOfflineNotificationModal() {
         const modal = document.getElementById('offline-popup-guard-root');
-        if(modal) modal.remove();
+        if (modal) modal.remove();
 
         if (currentUser) {
             const lowerUserTag = currentUser.fullTag.toLowerCase();
@@ -681,7 +750,7 @@
         const crewTitle = nameInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
         const rawTags = tagsInput.value.trim().toLowerCase();
 
-        if(!crewTitle || !rawTags) return;
+        if (!crewTitle || !rawTags) return;
 
         let memberList = rawTags.split(',').map(t => t.trim()).filter(Boolean);
         memberList.push(currentUser.fullTag.toLowerCase());
@@ -690,7 +759,7 @@
         const finalGroupId = `group_${crewTitle}_` + memberList.join('-');
 
         nameInput.value = ''; tagsInput.value = '';
-        if(isFromMobile) toggleMobileModal(false);
+        if (isFromMobile) toggleMobileModal(false);
 
         await supabaseClient.from('messages').insert([{
             sender: '🚨 System', tag: '#STUDIO', color: '#eccc68',
@@ -702,17 +771,17 @@
     }
 
     function getRoomId(userA, userB) { return [userA.toLowerCase(), userB.toLowerCase()].sort().join('_'); }
-    function handleDmTargetKey(e) { if(e.key === 'Enter') triggerMobileDmSubmit(false); }
+    function handleDmTargetKey(e) { if (e.key === 'Enter') triggerMobileDmSubmit(false); }
 
     function triggerMobileDmSubmit(isFromMobileModal = false) {
         const inputId = isFromMobileModal ? 'mobile-dm-target-input' : 'dm-target-input';
         const targetInput = document.getElementById(inputId);
         const targetUser = targetInput.value.trim();
         
-        if(!targetUser || targetUser.toLowerCase() === currentUser.fullTag.toLowerCase()) { targetInput.value = ''; return; }
+        if (!targetUser || targetUser.toLowerCase() === currentUser.fullTag.toLowerCase()) { targetInput.value = ''; return; }
 
-        if(!activeDms.some(val => val.toLowerCase() === targetUser.toLowerCase())) activeDms.push(targetUser.toLowerCase());
-        if(isFromMobileModal) { toggleMobileModal(false); updateMobileNavHighlights('chats'); }
+        if (!activeDms.some(val => val.toLowerCase() === targetUser.toLowerCase())) activeDms.push(targetUser.toLowerCase());
+        if (isFromMobileModal) { toggleMobileModal(false); updateMobileNavHighlights('chats'); }
 
         switchTab(getRoomId(currentUser.fullTag, targetUser), `💬 ${targetUser}`);
         targetInput.value = '';
@@ -720,18 +789,25 @@
 
     async function nukeChatRoom(targetId, event) {
         event.stopPropagation(); 
-        if(!confirm(`⚠️ Delete all messages inside this channel loop?`)) return;
+        if (!confirm(`⚠️ Delete all messages inside this channel loop?`)) return;
 
         try {
             await supabaseClient.from('messages').delete().eq('room', targetId);
             activeDms = activeDms.filter(u => u.toLowerCase() !== targetId.toLowerCase());
-            if (currentTab === targetId.toLowerCase()) { switchTab('global', '🌍 global-yapp'); updateMobileNavHighlights('global'); }
-            else renderDmList();
+            if (currentTab === targetId.toLowerCase()) { 
+                switchTab('global', '🌍 global-yapp'); 
+                updateMobileNavHighlights('global'); 
+            } else {
+                renderDmList();
+            }
         } catch (err) { console.error(err); }
     }
 
     async function executeSingleMessageDelete(msgId) {
-        try { await supabaseClient.from('messages').delete().eq('id', msgId); fetchMessages(); } catch (err) { console.error(err); }
+        try { 
+            await supabaseClient.from('messages').delete().eq('id', msgId); 
+            fetchMessages(); 
+        } catch (err) { console.error(err); }
     }
 
     function renderDmList() {
@@ -767,22 +843,28 @@
 
     function switchTab(tabId, titleText = '🌍 global-yapp') {
         currentTab = tabId.toLowerCase();
-        
         roomsWithUnreadBadges = roomsWithUnreadBadges.filter(r => r !== currentTab);
 
         document.getElementById('global-chan-btn').classList.toggle('active', currentTab === 'global');
-        document.getElementById('chat-title-text').innerText = titleText;
+        document.getElementById('chat-title-text').textContent = titleText;
         
         const nukeSlot = document.getElementById('admin-nuke-slot');
         if (currentUser && currentTab === 'global' && currentUser.fullTag === 'ADMIN#67676') nukeSlot.style.display = 'block';
         else nukeSlot.style.display = 'none';
 
-        renderDmList(); fetchMessages();
+        renderDmList(); 
+        fetchMessages();
     }
 
     function handleMobileNavClick(type) {
-        if(type === 'global') { toggleMobileModal(false); toggleAdminPanelOverlay(false); switchTab('global', '🌍 global-yapp'); updateMobileNavHighlights('global'); }
-        else if(type === 'chats') { toggleMobileModal(true); }
+        if (type === 'global') { 
+            toggleMobileModal(false); 
+            toggleAdminPanelOverlay(false); 
+            switchTab('global', '🌍 global-yapp'); 
+            updateMobileNavHighlights('global'); 
+        } else if (type === 'chats') { 
+            toggleMobileModal(true); 
+        }
     }
 
     function toggleMobileModal(show) {
@@ -807,9 +889,9 @@
 
     async function dispatchMessage() {
         const input = document.getElementById('chat-raw-input');
-        const text = input.value.trim(); if(!text) return;
+        const text = input.value.trim(); 
+        if (!text) return;
 
-        // Fetch maximum ID setup dynamically to clear local loops during typing
         const { data: returnRow } = await supabaseClient
             .from('messages')
             .insert([{ sender: currentUser.username, tag: currentUser.tag, color: currentUser.color, text: text, room: currentTab }])
@@ -854,15 +936,14 @@
                     
                     if (isGlobalMatch || isPrivateMatch) {
                         fetchMessages();
-                        // Automatically lift checkpoint barrier if you are active inside the talking tab loop
-                        if(currentUser) {
+                        if (currentUser) {
                             const lowerUserTag = currentUser.fullTag.toLowerCase();
                             localStorage.setItem(`yapp_last_read_id_${lowerUserTag}`, newMsg.id);
                         }
                     } else {
                         const messageSenderFullTag = `${newMsg.sender}${newMsg.tag}`.toLowerCase();
-                        if(currentUser && messageSenderFullTag !== currentUser.fullTag.toLowerCase()) {
-                            if(!roomsWithUnreadBadges.includes(targetRoomKeyLower)) {
+                        if (currentUser && messageSenderFullTag !== currentUser.fullTag.toLowerCase()) {
+                            if (!roomsWithUnreadBadges.includes(targetRoomKeyLower)) {
                                 roomsWithUnreadBadges.push(targetRoomKeyLower);
                                 renderDmList();
                             }
@@ -872,10 +953,12 @@
             }).subscribe();
     }
 
-    function handleChatKey(e) { if(e.key === 'Enter') dispatchMessage(); }
+    function handleChatKey(e) { if (e.key === 'Enter') dispatchMessage(); }
 
+    // 🛡️ SECURED RENDER: No raw innerHTML for chat text, eliminating stored XSS
     function renderMessages(messagesList) {
-        const pane = document.getElementById('messages-root'); pane.innerHTML = '';
+        const pane = document.getElementById('messages-root'); 
+        pane.innerHTML = '';
         if (!currentUser) return; 
 
         messagesList.forEach(msg => {
@@ -883,26 +966,56 @@
             const isMyOwnMessage = (msg.sender === currentUser.username && msg.tag === currentUser.tag);
             const isNotGlobalRoom = (currentTab !== 'global');
             const isAdminSession = (currentUser.fullTag === 'ADMIN#67676');
-            
-            let deleteButtonHtml = '';
+
+            const row = document.createElement('div'); 
+            row.className = 'message-row';
+
+            const pfp = document.createElement('div');
+            pfp.className = 'pfp-circle';
+            pfp.style.background = msg.color || '#3f3f46';
+            pfp.textContent = (msg.sender || 'Y')[0];
+
+            const msgContent = document.createElement('div');
+            msgContent.className = 'msg-content';
+
+            const msgMeta = document.createElement('div');
+            msgMeta.className = 'msg-meta';
+
+            const senderSpan = document.createElement('span');
+            senderSpan.textContent = msg.sender || 'Anonymous';
+
+            const tagSpan = document.createElement('span');
+            tagSpan.className = 'tag';
+            tagSpan.textContent = msg.tag || '';
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'time';
+            timeSpan.textContent = timeStr;
+
+            msgMeta.appendChild(senderSpan);
+            msgMeta.appendChild(tagSpan);
+            msgMeta.appendChild(timeSpan);
+
             if ((isMyOwnMessage && isNotGlobalRoom) || isAdminSession) {
-                deleteButtonHtml = `<button class="msg-delete-btn" onclick="executeSingleMessageDelete(${msg.id})">Delete</button>`;
+                const delBtn = document.createElement('button');
+                delBtn.className = 'msg-delete-btn';
+                delBtn.textContent = 'Delete';
+                delBtn.onclick = () => executeSingleMessageDelete(msg.id);
+                msgMeta.appendChild(delBtn);
             }
 
-            const row = document.createElement('div'); row.className = 'message-row';
-            row.innerHTML = `
-                <div class="pfp-circle" style="background: ${msg.color || '#3f3f46'}">${(msg.sender || 'Y')[0]}</div>
-                <div class="msg-content">
-                    <div class="msg-meta">
-                        ${msg.sender || 'Anonymous'}<span class="tag">${msg.tag || ''}</span><span class="time">${timeStr}</span>
-                        ${deleteButtonHtml}
-                    </div>
-                    <div class="msg-text">${msg.text || ''}</div>
-                </div>
-            `;
-            pane.appendChild(row);
+            const msgText = document.createElement('div');
+            msgText.className = 'msg-text';
+            msgText.textContent = msg.text || ''; // Safe plain-text sanitization
+
+            msgContent.appendChild(msgMeta);
+            msgContent.appendChild(msgText);
+
+            row.appendChild(pfp);
+            row.appendChild(msgContent);
+            pane.appendChild(row);[cite: 2]
         });
-        pane.scrollTop = pane.scrollHeight;
+        pane.scrollTop = pane.scrollHeight;[cite: 2]
     }
 </script>
 </body>
