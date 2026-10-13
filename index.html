@@ -59,7 +59,6 @@
 
         @keyframes popUp { 0% { transform: scale(0.96) translateY(15px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
         @keyframes msgSlide { 0% { transform: translateY(10px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-        @keyframes slideUpModal { 0% { transform: translateY(100%); } 100% { transform: translateY(0); } }
         @keyframes spinLogo { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
 
         /* =========================================
@@ -111,7 +110,6 @@
         .chan-btn:hover .nuke-room-trigger { opacity: 1; }
         .nuke-room-trigger:hover { background: var(--danger); color: white; }
 
-        /* Sidebar Inputs for DM and Groups */
         .sidebar-forms-deck { padding: 18px; border-top: 1px solid var(--glass-border); background: rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 15px; }
         .sidebar-forms-deck label { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; margin-bottom: 4px; display: block; letter-spacing: 0.5px; }
         .sidebar-forms-deck input { padding: 10px 12px; font-size: 0.85rem; border-radius: 8px; margin-bottom: 6px; width: 100%; }
@@ -127,7 +125,7 @@
            CHAT AREA
            ========================================= */
         .chat-main { flex: 1; display: flex; flex-direction: column; background: transparent; position: relative; min-width: 0; }
-        .chat-header { padding: 20px 24px; border-bottom: 1px solid var(--glass-border); font-weight: 900; font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 5; color: var(--accent); letter-spacing: 0.5px; }
+        .chat-header { padding: 20px 24px; border-bottom: 1px solid var(--glass-border); font-weight: 900; font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); backdrop-filter: blur(15px); z-index: 5; color: var(--accent); letter-spacing: 0.5px; }
         .messages-pane { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
         
         .message-row { display: flex; gap: 16px; align-items: flex-start; animation: msgSlide 0.35s cubic-bezier(0.215, 0.610, 0.355, 1); transition: background 0.2s; padding: 10px; border-radius: 12px; }
@@ -137,7 +135,8 @@
         .msg-meta .tag { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; background: rgba(255, 255, 255, 0.08); padding: 3px 6px; border-radius: 6px; }
         .msg-meta .time { color: var(--text-muted); font-weight: 500; font-size: 0.75rem; }
         
-        .msg-delete-btn { color: var(--danger); font-size: 0.7rem; cursor: pointer; border: 1px solid rgba(255,51,51,0.2); background: rgba(255,51,51,0.05); padding: 4px 10px; border-radius: 6px; transition: 0.2s; font-weight: bold; margin-left: auto; opacity: 0; text-transform: uppercase; flex-shrink: 0; }
+        /* Better Delete Button Visibility */
+        .msg-delete-btn { color: var(--danger); font-size: 0.7rem; cursor: pointer; border: 1px solid rgba(255,51,51,0.4); background: rgba(255,51,51,0.1); padding: 4px 10px; border-radius: 6px; transition: 0.2s; font-weight: bold; margin-left: auto; text-transform: uppercase; flex-shrink: 0; opacity: 0.5; }
         .message-row:hover .msg-delete-btn { opacity: 1; }
         .msg-delete-btn:hover { background: var(--danger); color: white; box-shadow: 0 0 12px rgba(255,51,51,0.4); }
         
@@ -147,7 +146,7 @@
         /* =========================================
            INPUT BAR
            ========================================= */
-        .input-container { padding: 24px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--glass-border); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .input-container { padding: 24px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
         .input-wrapper { display: flex; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 14px; padding: 6px; transition: 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
         .input-wrapper:focus-within { border-color: var(--accent); box-shadow: var(--accent-glow), inset 0 2px 5px rgba(0,0,0,0.5); background: rgba(0,0,0,0.7); }
         .input-wrapper input { flex: 1; background: transparent; border: none; padding: 14px; color: var(--text-main); outline: none; font-size: 1rem; width: 100%; }
@@ -155,7 +154,7 @@
         .input-wrapper button:hover { transform: scale(1.03); }
 
         /* =========================================
-           OVERLAY MODALS (ADMIN, SETTINGS, OFFLINE)
+           OVERLAY MODALS
            ========================================= */
         .overlay-modal { 
             display: none; 
@@ -164,7 +163,7 @@
             width: 100vw; 
             height: 100dvh; 
             background: rgba(5, 5, 5, 0.88); 
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); 
+            backdrop-filter: blur(30px); 
             z-index: 9999; 
             flex-direction: column; 
             padding: 20px 20px calc(90px + env(safe-area-inset-bottom)) 20px; 
@@ -178,62 +177,49 @@
 
         /* SETTINGS TOGGLES */
         .setting-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 14px; border: 1px solid var(--glass-border); margin-bottom: 15px; transition: 0.2s; }
-        .setting-row:hover { background: rgba(255,255,255,0.06); }
         .toggle-switch { width: 54px; height: 30px; background: rgba(255,255,255,0.1); border-radius: 15px; position: relative; cursor: pointer; transition: 0.3s; border: 1px solid var(--glass-border); flex-shrink: 0; }
         .toggle-switch.on { background: var(--accent); box-shadow: var(--accent-glow); border-color: var(--accent); }
         .toggle-knob { width: 22px; height: 22px; background: var(--bg-base); border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .toggle-switch.on .toggle-knob { left: 27px; }
 
-        /* ADMIN DIRECTORY */
-        .directory-wrap { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; min-height: 300px; overflow: hidden; }
-        .directory-table-container { flex: 1; overflow-y: auto; margin-top: 20px; }
-        .directory-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+        /* ADMIN DIRECTORY (Fixed Table Overflow) */
+        .directory-wrap { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; min-height: 300px; }
+        .directory-table-container { flex: 1; overflow: auto; margin-top: 20px; width: 100%; display: block; }
+        .directory-table { width: 100%; min-width: 650px; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
         .directory-table th, .directory-table td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .directory-table th { color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1.5px; font-weight: 800; }
         .ban-hammer-action { background: rgba(255,51,51,0.1); color: #ff8888; border: 1px solid rgba(255,51,51,0.3); padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .ban-hammer-action:hover { background: var(--danger); color: white; box-shadow: 0 0 20px rgba(255,51,51,0.5); }
 
         /* OFFLINE NOTIFICATION OVERLAY */
-        .offline-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 999999; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .offline-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 999999; backdrop-filter: blur(15px); animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .offline-alert-box { background: var(--panel-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 35px; width: 90%; max-width: 450px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); text-align: center; display: flex; flex-direction: column; gap: 20px; }
-        .offline-alert-box h3 { color: var(--accent); font-size: 1.4rem; font-weight: 900; letter-spacing: -0.5px; }
-        .offline-alert-box p { color: var(--text-muted); font-size: 1rem; line-height: 1.6; word-break: break-word; }
-
+        
         /* =========================================
            MOBILE SPECIFIC FIXES & RESPONSIVE
            ========================================= */
-        #mobile-dm-list-container {
-            display: flex; flex-direction: column; gap: 8px; flex: 1 1 auto;
-            min-height: 0; max-height: 45vh; overflow-y: auto; margin-bottom: 16px;
-        }
-        
-        .mobile-create-deck {
-            background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 16px; border: 1px solid var(--glass-border);
-            display: flex; flex-direction: column; gap: 14px; flex-shrink: 0;
-        }
-
+        #mobile-dm-list-container { display: flex; flex-direction: column; gap: 8px; flex: 1 1 auto; min-height: 0; max-height: 45vh; overflow-y: auto; margin-bottom: 16px; }
+        .mobile-create-deck { background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 16px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 14px; flex-shrink: 0; }
         .mobile-inline-form-row { display: flex; gap: 8px; width: 100%; }
         .mobile-inline-form-row input { flex: 1; padding: 12px; }
         .mobile-inline-form-row button { background: var(--accent); color: var(--bg-base); border: none; border-radius: 8px; padding: 0 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .mobile-inline-form-row button:hover { opacity: 0.8; }
 
-        .mobile-nav-bar { display: none; background: rgba(0,0,0,0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-top: 1px solid var(--glass-border); height: 75px; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
+        .mobile-nav-bar { display: none; background: rgba(0,0,0,0.8); backdrop-filter: blur(25px); border-top: 1px solid var(--glass-border); height: 75px; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
         .nav-item { color: var(--text-muted); font-size: 0.8rem; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 33%; height: 100%; justify-content: center; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; }
         .nav-item.active { color: var(--accent); text-shadow: var(--accent-glow); }
 
         @media (max-width: 768px) {
-            .app-container { width: 100vw; max-width: 100vw; height: 100%; max-height: 100%; border-radius: 0; border: none; display: flex; flex-direction: column; backdrop-filter: none; background: var(--bg-base); }
+            .app-container { width: 100vw; max-width: 100vw; height: 100%; max-height: 100%; border-radius: 0; border: none; display: flex; flex-direction: column; background: var(--bg-base); }
             .sidebar { display: none !important; } 
             .chat-main { flex: 1; display: flex; flex-direction: column; height: 0; min-height: 0; overflow: hidden; background: transparent; }
             .mobile-nav-bar { display: flex; }
             .input-container { padding: 15px; }
-            .msg-delete-btn { opacity: 1; } /* Always show delete button on touch screens */
+            .msg-delete-btn { opacity: 0.8; }
         }
     </style>
 </head>
 <body>
 
-    <!-- VFX BACKGROUND CANVAS -->
     <canvas id="vfx-canvas"></canvas>
 
     <!-- AUTH WALL -->
@@ -276,7 +262,6 @@
     <!-- MAIN APP CONTAINER -->
     <div class="app-container hidden" id="app-screen">
         
-        <!-- SIDEBAR (Desktop) -->
         <div class="sidebar">
             <div class="current-user-tag" onclick="openSettings()" title="Open System Config">
                 <div class="user-info-flex" id="user-profile-summary"></div>
@@ -291,7 +276,6 @@
                 <div id="dm-list-container" style="display:flex; flex-direction:column; gap:6px;"></div>
             </div>
             
-            <!-- Sidebar Forms for 1v1 and Groups -->
             <div class="sidebar-forms-deck">
                 <div>
                     <label>👤 START 1V1 DM</label>
@@ -313,7 +297,6 @@
             <div class="brand-footer" id="easter-egg-trigger" onclick="triggerEasterEgg()">BY CAVIAR STUDIOS © 2026</div>
         </div>
 
-        <!-- CHAT MAIN AREA -->
         <div class="chat-main">
             
             <!-- ⚙️ SETTINGS MODAL -->
@@ -327,7 +310,7 @@
                     <div class="setting-row">
                         <div>
                             <h4 style="color: var(--text-main); margin-bottom:6px; font-size: 1.1rem;">Liquid Particle VFX</h4>
-                            <p style="font-size:0.85rem; color:var(--text-muted);">Enable smooth background particles. (Disable on potato devices)</p>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Enable smooth background particles.</p>
                         </div>
                         <div class="toggle-switch on" id="toggle-vfx" onclick="toggleSetting('vfx')"><div class="toggle-knob"></div></div>
                     </div>
@@ -352,7 +335,7 @@
                 </div>
             </div>
 
-            <!-- 📊 ADMIN PANEL MODAL (XSS Patched, Passwords Hidden) -->
+            <!-- 📊 ADMIN PANEL MODAL -->
             <div class="overlay-modal" id="admin-panel-root-view">
                 <div style="max-width: 900px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; height: 100%;">
                     <div class="modal-header">
@@ -383,7 +366,7 @@
                 </div>
             </div>
 
-            <!-- MOBILE SLIDE DRAWER (Fixed Overlap Bug) -->
+            <!-- MOBILE SLIDE DRAWER -->
             <div class="overlay-modal" id="chats-overlay-modal" style="display: none; flex-direction: column;">
                 <div class="modal-header">
                     <h2 style="color: var(--accent); font-size: 1.4rem;">Channels</h2>
@@ -412,7 +395,6 @@
                 </div>
             </div>
 
-            <!-- CHAT HEADER & MESSAGES -->
             <div class="chat-header" id="chat-header-root">
                 <div id="chat-title-text">🌍 GLOBAL LINK</div>
                 <div id="admin-nuke-slot"></div>
@@ -437,13 +419,10 @@
         </div>
     </div>
 
-<!-- =========================================
-     JAVASCRIPT APPLICATION LOGIC
-     ========================================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     /* -------------------------------------------
-       SYSTEM CONFIG & STATE INITIALIZATION
+       SYSTEM CONFIG & STATE
        ------------------------------------------- */
     const SUPABASE_URL = 'https://jbgodvduntlpblubkpxj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZ29kdmR1bnRscGJsdWJrcHhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMzk2NjEsImV4cCI6MjA5NjkxNTY2MX0.4wOvYohtw9U0bGrHaV2RHvJFoJqhQKVZxBZf09z_1lE'; 
@@ -464,7 +443,7 @@
     });
 
     /* -------------------------------------------
-       AUDIO SFX ENGINE (Web Audio API)
+       AUDIO SFX ENGINE
        ------------------------------------------- */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSfx(type) {
@@ -494,7 +473,7 @@
     }
 
     /* -------------------------------------------
-       SMOOTH CANVAS CONSTELLATION VFX ENGINE
+       CANVAS VFX ENGINE
        ------------------------------------------- */
     const canvas = document.getElementById('vfx-canvas');
     const ctx = canvas.getContext('2d');
@@ -639,7 +618,7 @@
     }
 
     /* -------------------------------------------
-       AUTH & DATABASE LOGIC
+       AUTH & INITIALIZATION
        ------------------------------------------- */
     function showBanner(type, text) {
         document.getElementById('error-message').style.display = 'none';
@@ -745,14 +724,13 @@
     }
 
     /* -------------------------------------------
-       ADMIN CORE & DELETE PROTOCOLS
+       ADMIN CORE (SQL POLICY REQUIRED TO FIX DELETES)
        ------------------------------------------- */
     function evaluateAdminPermissions() {
         const nukeSlot = document.getElementById('admin-nuke-slot');
         const deskTrigger = document.getElementById('desktop-admin-panel-trigger-slot');
         const mobTrigger = document.getElementById('mobile-admin-panel-trigger-slot');
         
-        // Use toUpperCase to prevent case-sensitive tag bugs for admin login
         if (currentUser && currentUser.fullTag.toUpperCase() === 'ADMIN#67676') {
             nukeSlot.innerHTML = `<button onclick="nukeGlobalChatLog()" class="ban-hammer-action" style="padding:6px 12px; text-transform:uppercase; font-size: 0.75rem;">💥 NUKE LOG</button>`;
             const adminBtn = `<button class="btn" style="background:#ffffff; color:#000000; font-size:0.85rem; margin-top:10px; width:100%; border-radius:8px;" onclick="document.getElementById('admin-panel-root-view').style.display='flex'; refreshLiveDatabaseDirectory();">👑 OPEN ADMIN CORE</button>`;
@@ -795,12 +773,19 @@
 
     async function dropTheBanHammer(usr, tag) {
         if (!confirm(`⚠️ Vaporize ${usr}${tag}? This drops all messages and bans the tag forever.`)) return;
-        try {
-            await supabaseClient.from('bans').insert([{ target_fulltag: `${usr}${tag}`.toLowerCase() }]);
-            await supabaseClient.from('users').delete().eq('username', usr).eq('tag', tag);
-            await supabaseClient.from('messages').delete().ilike('sender', usr).eq('tag', tag);
-            refreshLiveDatabaseDirectory(); fetchMessages();
-        } catch (e) { alert("Error applying ban protocol. Check Supabase RLS."); }
+        
+        await supabaseClient.from('bans').insert([{ target_fulltag: `${usr}${tag}`.toLowerCase() }]);
+        
+        // Supabase RLS will block these until you run the SQL script in Step 1
+        const { error: uErr } = await supabaseClient.from('users').delete().eq('username', usr).eq('tag', tag);
+        const { error: mErr } = await supabaseClient.from('messages').delete().ilike('sender', usr).eq('tag', tag);
+        
+        if (uErr || mErr) {
+            alert("❌ Ban saved, but Database blocked the message wipe! You must run the SQL Delete Policy in Supabase to allow this.");
+        } else {
+            refreshLiveDatabaseDirectory(); 
+            fetchMessages();
+        }
     }
 
     async function nukeGlobalChatLog() {
@@ -808,18 +793,14 @@
         const { error } = await supabaseClient.from('messages').delete().is('room', null);
         await supabaseClient.from('messages').delete().eq('room', 'global');
         
-        if (error) { alert("Delete failed! Your Supabase RLS policy is currently blocking DELETES via the anon key."); } 
+        if (error) { alert("❌ Delete blocked by Supabase! Run the SQL Delete Policy to fix this."); } 
         else { fetchMessages(); }
     }
 
     async function executeSingleMessageDelete(msgId) {
         const { error } = await supabaseClient.from('messages').delete().eq('id', msgId); 
-        if (error) { 
-            alert("Delete failed! Your Supabase RLS policy requires updating to allow deletes.");
-            console.error(error); 
-        } else {
-            fetchMessages(); 
-        }
+        if (error) { alert("❌ Delete blocked by Supabase! Run the SQL Delete Policy to fix this."); } 
+        else { fetchMessages(); }
     }
 
     async function nukeChatRoom(targetId, event) {
@@ -829,7 +810,7 @@
         const { error } = await supabaseClient.from('messages').delete().eq('room', targetId);
         
         if (error) {
-            alert("Delete failed! Supabase RLS blocked the action.");
+            alert("❌ Delete blocked by Supabase! Run the SQL Delete Policy to fix this.");
         } else {
             activeDms = activeDms.filter(u => u.toLowerCase() !== targetId.toLowerCase());
             if (currentTab === targetId.toLowerCase()) { switchTab('global', '🌍 GLOBAL LINK'); } 
@@ -838,7 +819,7 @@
     }
 
     /* -------------------------------------------
-       CHAT & DM ROUTING & OFFLINE SCANNER
+       CHAT & DM ROUTING & OFFLINE SCANNER (BUGS FIXED)
        ------------------------------------------- */
     async function autoDiscoverRooms() {
         if (!currentUser) return;
@@ -849,9 +830,13 @@
 
             (data || []).forEach(msg => {
                 const r = msg.room.toLowerCase();
+                // FIXED PARSER LOGIC
                 if (r.startsWith('group_')) {
-                    const members = r.replace('group_', '').split('-');
-                    if (members.includes(lowerTag)) foundDms.add(msg.room); 
+                    const parts = r.split('_');
+                    if (parts.length >= 3) {
+                        const members = parts[2].split('-');
+                        if (members.includes(lowerTag)) foundDms.add(msg.room); 
+                    }
                 } else {
                     const parts = r.split('_');
                     if (parts.includes(lowerTag)) {
@@ -884,11 +869,15 @@
                     if (senderSignature.toLowerCase() !== lowerUserTag) {
                         const r = yap.room ? yap.room.toLowerCase() : 'global';
                         
+                        // FIXED PARSER LOGIC
                         if (r.startsWith('group_')) {
-                            const members = r.replace('group_', '').split('-');
-                            if (members.includes(lowerUserTag)) {
-                                if (!roomsWithUnreadBadges.includes(r)) roomsWithUnreadBadges.push(r);
-                                unreadSendersList.add(`👥 #${r.split('_')[1].toUpperCase()}`);
+                            const parts = r.split('_');
+                            if (parts.length >= 3) {
+                                const members = parts[2].split('-');
+                                if (members.includes(lowerUserTag)) {
+                                    if (!roomsWithUnreadBadges.includes(r)) roomsWithUnreadBadges.push(r);
+                                    unreadSendersList.add(`👥 #${parts[1].toUpperCase()}`);
+                                }
                             }
                         } else if (r !== 'global') {
                             const structuralParts = r.split('_');
@@ -921,11 +910,8 @@
                 btn.textContent = 'OK, SHOW ME';
                 btn.onclick = dismissOfflineNotificationModal;
 
-                box.appendChild(h3);
-                box.appendChild(p);
-                box.appendChild(btn);
-                overlay.appendChild(box);
-                document.body.appendChild(overlay);
+                box.appendChild(h3); box.appendChild(p); box.appendChild(btn);
+                overlay.appendChild(box); document.body.appendChild(overlay);
                 
                 playSfx('receive'); 
             } else {
@@ -985,7 +971,16 @@
 
         activeDms.forEach(id => {
             const isGroup = id.startsWith('group_');
-            const displayName = isGroup ? `👥 ${id.split('_')[1].toUpperCase()}` : `💬 ${id.toUpperCase()}`;
+            
+            // Extract the actual display name carefully
+            let displayName = '';
+            if (isGroup) {
+                const parts = id.split('_');
+                displayName = `👥 ${parts[1].toUpperCase()}`;
+            } else {
+                displayName = `💬 ${id.toUpperCase()}`;
+            }
+            
             const targetRoomKey = isGroup ? id : [currentUser.fullTag.toLowerCase(), id.toLowerCase()].sort().join('_');
             const lowerKey = targetRoomKey.toLowerCase();
             const badgeHtml = roomsWithUnreadBadges.includes(lowerKey) ? `<span class="unread-dot-badge"></span>` : '';
@@ -1069,11 +1064,15 @@
                 const newMsg = payload.new;
                 const targetRoomKeyLower = newMsg.room ? newMsg.room.toLowerCase() : 'global';
 
+                // FIXED PARSER LOGIC
                 if (newMsg.room && newMsg.room !== 'global') {
                     if (targetRoomKeyLower.startsWith('group_')) {
-                        const members = targetRoomKeyLower.replace('group_', '').split('-');
-                        if (currentUser && members.includes(currentUser.fullTag.toLowerCase()) && !activeDms.includes(newMsg.room)) {
-                            activeDms.push(newMsg.room); renderDmList();
+                        const parts = targetRoomKeyLower.split('_');
+                        if (parts.length >= 3) {
+                            const members = parts[2].split('-');
+                            if (currentUser && members.includes(currentUser.fullTag.toLowerCase()) && !activeDms.includes(newMsg.room)) {
+                                activeDms.push(newMsg.room); renderDmList();
+                            }
                         }
                     } else {
                         const structuralParts = targetRoomKeyLower.split('_');
@@ -1133,7 +1132,6 @@
 
             msgMeta.appendChild(senderSpan); msgMeta.appendChild(tagSpan); msgMeta.appendChild(timeSpan);
 
-            // Deletes allowed for your own messages in DMs/Groups, OR if you are Admin
             if ((isMine && currentTab !== 'global') || isAdmin) {
                 const delBtn = document.createElement('button'); 
                 delBtn.className = 'msg-delete-btn';
@@ -1143,7 +1141,7 @@
             }
 
             const msgText = document.createElement('div'); msgText.className = 'msg-text';
-            msgText.textContent = msg.text || ''; // XSS PATCHED
+            msgText.textContent = msg.text || ''; 
 
             msgContent.appendChild(msgMeta); msgContent.appendChild(msgText);
             row.appendChild(pfp); row.appendChild(msgContent);
